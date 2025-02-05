@@ -1,0 +1,4 @@
+2016/10/21
+
+Les systèmes d'inscription, de connexion et de déconnexion sont opérationnels.
+Les pages sont aérées et commentées pour plus de visibilité et de compréhension.
