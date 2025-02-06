@@ -1,36 +1,61 @@
 <?php
-require 'menu.php';
+session_start();
+
+if (!isset($_SESSION['login']))
+{
+    header('location: index.php');
+}
+require 'bdd_connexion.php';
 $login = $_SESSION['login'];
 
-require 'bdd_connexion.php';
 
-echo '<br /><h2>Mode Histoire</h2>';
 
-$req = $pdo->prepare("SELECT * FROM users WHERE login=?");
-$req->execute(array($login));
-$donnees = $req->fetch();
-
-$user_id = $donnees['user_id'];
-
-if (empty($donnees['mh_step'])) 
-    {
-    
+mh_ini()
+{
     $req = $pdo->prepare
     ('
         UPDATE users
         SET mh_step = :mh_step
-        WHERE user_id = :user_id
+        WHERE login = :login
     ');
     $req->execute
     ([
         'mh_step' => 1,
-        'user_id' => $user_id
+        'login' => $login
     ]);
+    echo 'Vous venez de débloquer de Mode Histoire !';
+}
 
 
-    $mh_step = 0;
+check_mh_step()
+{
+     $req = $pdo->prepare("SELECT * FROM users WHERE login=?");
+     $req->execute(array($login));
+     $donnees = $req->fetch();
+     $mh_step = $donnees['mh_step']
+     switch($mh_step)
+     {
+        case 1:
+            $target_perso = Naruto;
+            break;
+        case 2:
+            $target_perso = Sakura;
+            break;
+        case 3:
+            $target_perso = Sasuke;
+            break;
+        case 5:
+            $target_perso = Kakashi;
+            break;
+     }
+}
 
-    // $target_perso = $value_case;
+
+
+
+function new_perso()
+{
+    $target_perso = $value_case;
     $req = $pdo->prepare
     ('
         INSERT INTO persos (owner_perso, name_perso, xp_perso, nin_perso, tai_perso, gen_perso, life_perso, avatar_perso, win, lose, draw, kills, deaths, training_nin, training_tai, training_gen, training_life)
@@ -57,17 +82,8 @@ if (empty($donnees['mh_step']))
         'training_gen' => 0,
         'training_life' => 0
     ]);
+    echo $target_perso . 'a été débloqué !';
+}
+    
 
-
-    echo '<br />Naruto a été débloqué !';
-    } 
-
-    else 
-    {
-        $mh_step = $donnees['mh_step'];
-        // $req = $pdo->prepare("SELECT * FROM users WHERE login=?");
-        // $req->execute(array($login));
-        // $donnees = $req->fetch();
-        echo '<br />Etape ' . $mh_step;
-    }
 ?>
