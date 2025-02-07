@@ -1,16 +1,16 @@
 <?php
-require 'menu.php';
-$login = $_SESSION['login'];
-echo  '<h2><br /><br /><br /><br />Gestion des personnages de ' . $login . '<br /></h2>';
-require 'bdd_connexion.php';
-$req=$pdo->prepare("SELECT * FROM users WHERE login=?");
-$req->execute(array($login));
-$donnees=$req->fetch();
+    require 'menu.php';
+    $login = $_SESSION['login'];
+    echo  '<h2><br /><br /><br /><br />Gestion des personnages de ' . $login . '<br /></h2>';
+    require 'bdd_connexion.php';
+    $req=$pdo->prepare("SELECT * FROM users WHERE login=?");
+    $req->execute(array($login));
+    $donnees=$req->fetch();
 
 
-$req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso=?");
-$req->execute(array($login));
-$donnees=$req->fetch();
+    $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso=?");
+    $req->execute(array($login));
+    $donnees=$req->fetch();
 
     $joueurs = 0;
     $fighters = 0;
@@ -21,12 +21,12 @@ $donnees=$req->fetch();
     $fighters = $req->fetchAll();
 
     echo '<br /><br /><br /><br /><br />Nom du perso : ' . ucfirst($donnees['name_perso']);    
-        echo '<br />Expérience : ' . $donnees['xp_perso'];    
-            echo '<br />Ninjutsu : ' . $donnees['nin_perso'];
-            echo '<br />Taijutsu : ' . $donnees['tai_perso'];
-            echo '<br />Genjutsu : ' . $donnees['gen_perso'];
-            // echo '<br /><br />Nombre de joueurs : ' . $joueurs;
-            // echo '<br />Nombre de combattants : ' . $fighters;
+    echo '<br />Expérience : ' . $donnees['xp_perso'];    
+    echo '<br />Ninjutsu : ' . $donnees['nin_perso'];
+    echo '<br />Taijutsu : ' . $donnees['tai_perso'];
+    echo '<br />Genjutsu : ' . $donnees['gen_perso'];
+    // echo '<br /><br />Nombre de joueurs : ' . $joueurs;
+    // echo '<br />Nombre de combattants : ' . $fighters;
 
     echo '<h4>Liste des personnages disponibles pour combattre : </h4>';
 
@@ -37,7 +37,6 @@ $donnees=$req->fetch();
             continue;
         }
         
-
         
         echo $fighter['owner_perso'];
         echo ' (';
