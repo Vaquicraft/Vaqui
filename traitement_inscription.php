@@ -70,7 +70,32 @@ else
 		'mh_step' => 1));
 
 
-	new_perso();
+		$req = $pdo->prepare
+		('
+			INSERT INTO persos (owner_perso, name_perso, xp_perso, nin_perso, tai_perso, gen_perso, life_perso, avatar_perso, win, lose, draw, kills, deaths, training_nin, training_tai, training_gen, training_life)
+			VALUES (:owner_perso, :name_perso, :xp_perso, :nin_perso, :tai_perso, :gen_perso, :life_perso, :avatar_perso, :win, :lose, :draw, :kills, :deaths, :training_nin, :training_tai, :training_gen, :training_life)
+		');
+	
+		$req->execute
+		([
+			'owner_perso' => $login,
+			'name_perso' => "Naruto",
+			'xp_perso' => 0,
+			'nin_perso' => 0,
+			'tai_perso' => 0,
+			'gen_perso' => 0,
+			'life_perso' => 100,
+			'avatar_perso' => 1,
+			'win' => 0,
+			'lose' => 0,
+			'draw' => 0,
+			'kills' => 0,
+			'deaths' => 0,
+			'training_nin' => 0,
+			'training_tai' => 0,
+			'training_gen' => 0,
+			'training_life' => 0
+		]);
 
 	echo "<html> <center> Votre inscription s'est déroulée avec succès ! </center> <br /> </html>";
 	echo '<html> <center><a href="index.php">Cliquez ici pour vous connecter</a></center> <br /> </html>';

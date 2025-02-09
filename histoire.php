@@ -1,19 +1,20 @@
 <?php
 require 'menu.php';
 require 'functions.php';
+check_login();
 bdd_connexion();
 
 echo '<br /><h2>Mode Histoire</h2>';
+echo "$login";
 
 $req = $pdo->prepare("SELECT * FROM users WHERE login=?");
 $req->execute(array($login));
 $donnees = $req->fetch();
-
-$user_id = $donnees['user_id'];
-
+$mh_step = $donnees['mh_step'];
 
 
-check_mh_step();
+
+
 $req = $pdo->prepare("SELECT * FROM mh_steps WHERE mh_step=?");
 $req->execute(array($mh_step));
 $donnees = $req->fetch();
