@@ -6,11 +6,6 @@ menu();
 power();
     echo  '<h2><br /><br /><br /><br />Gestion des personnages de ' . $login . '<br /></h2>';
 
-    $req=$pdo->prepare("SELECT * FROM users WHERE login=?");
-    $req->execute(array($login));
-    $donnees=$req->fetch();
-
-
     $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso=?");
     $req->execute(array($login));
     $donnees=$req->fetch();
@@ -23,12 +18,9 @@ power();
     $req->execute();
     $fighters = $req->fetchAll();
 
-    echo '<br /><br /><br /><br /><br />Nom du perso : ' . ucfirst($donnees['name_perso']);    
-    echo '<br />Expérience : ' . $donnees['xp_perso'];    
-    echo '<br />Ninjutsu : ' . $donnees['nin_perso'];
-    echo '<br />Taijutsu : ' . $donnees['tai_perso'];
-    echo '<br />Genjutsu : ' . $donnees['gen_perso'];
-    echo '<br />Puissance : ' . $power;
+    current_perso_stats();
+    echo '<br />';
+    echo '<br />Expérience : ' . $donnees['xp_perso'];  
     // echo '<br /><br />Nombre de joueurs : ' . $joueurs;
     // echo '<br />Nombre de combattants : ' . $fighters;
 
