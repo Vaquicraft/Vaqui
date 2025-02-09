@@ -12,7 +12,8 @@ if (empty($_POST))
 	header('location: inscription.php');
 }
 
-require 'bdd_connexion.php';
+require 'functions.php';
+bdd_connexion();
 require 'inscription.php';
 
 
@@ -61,11 +62,15 @@ else
 	$passwordverif = $_POST['passwordverif'];
 	$mail = $_POST['mail'];
 			
-	$req = $pdo->prepare('INSERT INTO users(login, password, mail, date_inscription) VALUES(:login, :password, :mail, NOW())');
+	$req = $pdo->prepare('INSERT INTO users(login, password, mail, date_inscription, mh_step) VALUES(:login, :password, :mail, NOW(), :mh_step)');
 	$req->execute(array(
 		'login' => $login,
 		'password' => $pass_hache,
-		'mail' => $mail));
+		'mail' => $mail,
+		'mh_step' => 1));
+
+
+	new_perso();
 
 	echo "<html> <center> Votre inscription s'est déroulée avec succès ! </center> <br /> </html>";
 	echo '<html> <center><a href="index.php">Cliquez ici pour vous connecter</a></center> <br /> </html>';

@@ -1,8 +1,9 @@
 <?php
     require 'menu.php';
-    $login = $_SESSION['login'];
+    require 'functions.php';
+    bdd_connexion();
     echo  '<h2><br /><br /><br /><br />Gestion des personnages de ' . $login . '<br /></h2>';
-    require 'bdd_connexion.php';
+
     $req=$pdo->prepare("SELECT * FROM users WHERE login=?");
     $req->execute(array($login));
     $donnees=$req->fetch();

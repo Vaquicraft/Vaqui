@@ -1,8 +1,7 @@
 <?php
 require 'menu.php';
-$login = $_SESSION['login'];
-
-require 'bdd_connexion.php';
+require 'functions.php';
+bdd_connexion();
 
 echo '<br /><h2>Mode Histoire</h2>';
 
@@ -12,15 +11,16 @@ $donnees = $req->fetch();
 
 $user_id = $donnees['user_id'];
 
-if (empty($donnees['mh_step'])) 
-    {
-        require 'functions.php';
-        mh_ini();
-        check_mh_step();
-        new_perso();
-    }
+
+
+check_mh_step();
+$req = $pdo->prepare("SELECT * FROM mh_steps WHERE mh_step=?");
+$req->execute(array($mh_step));
+$donnees = $req->fetch();
+echo '<h2><center>Étape ' .$donnees['mh_step'] .' - ' . $donnees['mh_title'] . '</h2></center><br /><br />';
+echo $donnees['mh_dialogue'] . '<br /><br />';
     
- 
+
 
 
 ?>
