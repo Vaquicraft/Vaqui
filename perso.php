@@ -1,7 +1,8 @@
 <?php
-    require 'menu.php';
-    require 'functions.php';
-    bdd_connexion();
+require 'functions.php';
+check_login();
+bdd_connexion();
+menu();
     echo  '<h2><br /><br /><br /><br />Gestion des personnages de ' . $login . '<br /></h2>';
 
     $req=$pdo->prepare("SELECT * FROM users WHERE login=?");

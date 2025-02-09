@@ -5,10 +5,11 @@ function check_login()
     if (session_status() == PHP_SESSION_NONE)
         {
         session_start();
+        $login = $_SESSION['login'];
             if (!isset($_SESSION['login']))
             {
             header('location: index.php');
-            $login = $_SESSION['login'];
+            
             }
     }   
 
@@ -30,6 +31,7 @@ catch(Exception $e)
 
 function menu()
 {
+    echo'<html> <link rel="stylesheet" href="style.css" /> <title> Naruto Project </title> </html>';
     echo '<br /> <br />';
 	echo '<br /><a href="membre.php">Accueil</a>';
 	echo '<br /><a href="perso.php">Persos</a>';

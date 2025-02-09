@@ -1,11 +1,10 @@
 <?php
-require 'menu.php';
 require 'functions.php';
 check_login();
 bdd_connexion();
+menu();
 
 echo '<br /><h2>Mode Histoire</h2>';
-echo "$login";
 
 $req = $pdo->prepare("SELECT * FROM users WHERE login=?");
 $req->execute(array($login));
