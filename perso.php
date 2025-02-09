@@ -3,6 +3,7 @@ require 'functions.php';
 check_login();
 bdd_connexion();
 menu();
+power();
     echo  '<h2><br /><br /><br /><br />Gestion des personnages de ' . $login . '<br /></h2>';
 
     $req=$pdo->prepare("SELECT * FROM users WHERE login=?");
@@ -27,6 +28,7 @@ menu();
     echo '<br />Ninjutsu : ' . $donnees['nin_perso'];
     echo '<br />Taijutsu : ' . $donnees['tai_perso'];
     echo '<br />Genjutsu : ' . $donnees['gen_perso'];
+    echo '<br />Puissance : ' . $power;
     // echo '<br /><br />Nombre de joueurs : ' . $joueurs;
     // echo '<br />Nombre de combattants : ' . $fighters;
 

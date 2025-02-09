@@ -31,6 +31,7 @@ catch(Exception $e)
 
 function menu()
 {
+    echo $_SESSION['login'];
     echo'<html> <link rel="stylesheet" href="style.css" /> <title> Naruto Project </title> </html>';
     echo '<br /> <br />';
 	echo '<br /><a href="membre.php">Accueil</a>';
@@ -101,6 +102,22 @@ function new_perso()
         'training_life' => 0
     ]);
     echo $new_perso . ' a été débloqué !<br />';
+}
+
+function power()
+{
+    check_login();
+    bdd_connexion();
+    global $pdo, $login, $power;
+
+    $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso=?");
+    $req->execute(array($login));
+    $data=$req->fetch();
+    $pts_nin = $data['nin_perso'] * 1.1;
+    $pts_tai = $data['tai_perso'] * 1.1;
+    $pts_gen = $data['gen_perso'] * 1.1;
+    $pts_life = $data['life_perso'] * 0.01;
+    $power = $pts_nin + $pts_tai + $pts_gen + $pts_life;
 }
     
 ?>
