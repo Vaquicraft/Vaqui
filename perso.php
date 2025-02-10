@@ -4,25 +4,52 @@ check_login();
 bdd_connexion();
 menu();
 power();
+    
+    
+
     echo  '<h2><br /><br /><br /><br />Gestion des personnages de ' . $login . '<br /></h2>';
-
     $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso=?");
-    $req->execute(array($login));
-    $donnees=$req->fetch();
+    $req->execute([($login)]);
+    $persos=$req->fetchAll();
 
-    $joueurs = 0;
-    $fighters = 0;
+    foreach ($persos as $perso)
+    {
+        
+        if(isset($_GET['perso']))
+        {
+            if ($_GET['perso'] !== $perso['name_perso'])
+          {
+            continue;
+          }
+        else
+        {
+            echo 'Vous avez sélectionné ' . $_GET['perso'];
+            $modified = $_GET['perso'];
+            $req = $pdo->prepare("UPDATE users SET selected_perso = ? WHERE login = ?");
+            $req->execute([$modified, $login]);
+            header("Location: " . $_SERVER['PHP_SELF']);
+        }
+        }
+        
+        
+        
+
+
+  
+
+        echo '<a href="perso.php?perso=' . $perso['name_perso'] . '"><b><br /><br /><br /><br />' . $perso['name_perso'] . '</b></a>'; 
+        echo '<br />Puissance : ' . $power;  
+        echo '<br />Ninjutsu : ' . $perso['nin_perso'];
+        echo '<br />Taijutsu : ' . $perso['tai_perso'];
+        echo '<br />Genjutsu : ' . $perso['gen_perso'];
+        echo '<br />Vie : ' . $perso['life_perso'];
+        echo '<br /><br />';
+    }
 
     $req = 'SELECT * FROM persos';
     $req = $pdo->prepare($req);
     $req->execute();
     $fighters = $req->fetchAll();
-
-    current_perso_stats();
-    echo '<br />';
-    echo '<br />Expérience : ' . $donnees['xp_perso'];  
-    // echo '<br /><br />Nombre de joueurs : ' . $joueurs;
-    // echo '<br />Nombre de combattants : ' . $fighters;
 
     echo '<h4>Liste des personnages disponibles pour combattre : </h4>';
 

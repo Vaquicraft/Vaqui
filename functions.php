@@ -32,13 +32,16 @@ catch(Exception $e)
 function menu()
 {
     echo $_SESSION['login'];
+    current_perso_stats();
     echo'<html> <link rel="stylesheet" href="style.css" /> <title> Naruto Project </title> </html>';
     echo '<br /> <br />';
 	echo '<br /><a href="membre.php">Accueil</a>';
 	echo '<br /><a href="perso.php">Persos</a>';
 	echo '<br /><a href="histoire.php">Mode Histoire</a>';
+    echo '<br /><a href="training.php">Entraînements</a>';
 	echo '<br /><a href="tchat.php">Tchat</a>';
 	echo '<br /><a href="deconnexion.php">Se déconnecter</a><br /><br />';
+    
 }
 	
 
@@ -97,22 +100,30 @@ function power()
 {
     check_login();
     bdd_connexion();
-    global $pdo, $login, $power;
+    global $pdo, $login, $power, $data, $perso;
 
     $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso=?");
     $req->execute(array($login));
-    $power_data=$req->fetch();
-    $pts_nin = $power_data['nin_perso'] * 1.1;
-    $pts_tai = $power_data['tai_perso'] * 1.1;
-    $pts_gen = $power_data['gen_perso'] * 1.1;
-    $pts_life = $power_data['life_perso'] * 0.01;
+    $data=$req->fetch();
+    $pts_nin = $data['nin_perso'] * 1.1;
+    $pts_tai = $data['tai_perso'] * 1.1;
+    $pts_gen = $data['gen_perso'] * 1.1;
+    $pts_life = $data['life_perso'] * 0.01;
     $power = $pts_nin + $pts_tai + $pts_gen + $pts_life;
     $power = $power + 10;
+    return $power;
 }
+
+
+
+
+
+
+
 
 function current_perso_stats()
 {
-    global $current_perso_data, $pdo, $login, $power;
+    global $current_perso_data, $pdo, $login, $power, $perso;
     check_login();
     bdd_connexion();
     power();
@@ -124,31 +135,62 @@ function current_perso_stats()
     WHERE users.login = ?
     ");
     $req->execute(array($login));
-    $current_perso_data = $req->fetch();
+    $perso = $req->fetch();
+
+    perso_stats();
+}
+
+function list_perso_stats()
+{
+    global $pdo, $login, $perso, $persos;
+    check_login();
+    bdd_connexion();
+    $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso=?");
+    $req->execute([($login)]);
+    $persos=$req->fetchAll();
+
+}
 
 
-    echo '<br /><br /><br /><br /><br />Nom du perso : ' . $current_perso_data['name_perso'];    
+
+
+
+function perso_stats()
+{
+    global $login, $pdo, $data_mh_step, $power, $data_list_persos, $perso;
+    check_login();
+    bdd_connexion();
+    mh_step();
+    echo '<br /><br /><br /><br /><b>' . $perso['selected_perso'] . '</b>';    
     echo '<br />Puissance : ' . $power;  
-    echo '<br />Ninjutsu : ' . $current_perso_data['nin_perso'];
-    echo '<br />Taijutsu : ' . $current_perso_data['tai_perso'];
-    echo '<br />Genjutsu : ' . $current_perso_data['gen_perso'];
-    echo '<br />Vie : ' . $current_perso_data['life_perso'];
+    echo '<br />Ninjutsu : ' . $perso['nin_perso'];
+    echo '<br />Taijutsu : ' . $perso['tai_perso'];
+    echo '<br />Genjutsu : ' . $perso['gen_perso'];
+    echo '<br />Vie : ' . $perso['life_perso'];
     echo '<br /><br />';
 }
 
+
+
+
+
+
+
+
+
+
+
+
 function current_mh_perso_stats()
 {
-    global $current_perso_data, $pdo, $login, $power;
+    global $current_perso_data, $pdo, $login, $power, $data_mh_step;
     check_login();
     bdd_connexion();
     power();
     mh_step();
 
 
-    $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso=?");
-    $req->execute(array($login));
-    $current_perso_mh_data=$req->fetch();
-    echo '' . $current_perso_mh_data['name_perso'];    
+    echo '' . $data_mh_step['mh_perso'];    
     echo '<br />Puissance : ' . $power;  
     
 }
@@ -206,5 +248,8 @@ function mh_process_win()
     
 
 }
-  
+
+
+
+
 ?>

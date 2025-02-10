@@ -3,22 +3,20 @@ require 'functions.php';
 check_login();
 bdd_connexion();
 menu();
+mh_step();
+current_perso_stats();
 
 echo '<br /><h2>Mode Histoire</h2>';
 
-$req = $pdo->prepare("SELECT * FROM users WHERE login=?");
-$req->execute(array($login));
-$donnees = $req->fetch();
-$data_step = $donnees['mh_step'];
+echo '<h2><center>Étape ' .$data_mh_step['mh_step'] .' - ' . $data_mh_step['mh_title'] . '</h2></center><br /><br />';
+if ($data_mh_step['mh_perso'] !== $data_mh_step['selected_perso'])
+{
+    echo 'Vous devez utiliser ' . $data_mh_step['mh_perso'] . ' pour cette étape.';
+    die;
 
+}
 
-
-
-$req = $pdo->prepare("SELECT * FROM mh_steps WHERE mh_step=?");
-$req->execute(array($data_step));
-$donnees = $req->fetch();
-echo '<h2><center>Étape ' .$donnees['mh_step'] .' - ' . $donnees['mh_title'] . '</h2></center><br /><br />';
-echo $donnees['mh_dialogue'] . '<br /><br />';
+echo $data_mh_step['mh_dialogue'] . '<br /><br />';
 echo '<br /><a href="valider_histoire.php">Combattre !</a>';
     
 
