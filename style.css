@@ -1,8 +1,131 @@
+* {
+    box-sizing: border-box;
+}
+
+
 body
 {
 background-color: #C9F0F2;
 }
-strong
+
+.links
 {
-color: red;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    background-color: #55aaad;
+    border-radius: 20px;
+    margin-left:40%;
+    margin-right:40%;
+    
+}
+
+.links ul
+{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    list-style:none;
+
+
+  
+}
+
+
+
+.links ul li
+{
+    
+    margin: 0 10px;
+    padding: 5px;
+    border-radius: 10px;
+    background-color: #abdbdd;
+    color: white;
+    
+}
+
+a
+{
+    color: black;
+    text-decoration: none;
+    border-radius: 10px;
+    margin: 0 10px;
+}
+
+a:hover
+{
+    background-color: #35999c;
+    margin-left:10px;
+}
+
+
+.link
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom:10px;
+    margin-right:auto;
+    
+}
+
+.pseudo
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 10px;
+    margin-top:-10px;
+}
+
+.welcome
+{
+    margin: 0 1px;
+}
+
+.statsName
+{
+    margin: 0 20px;
+    border: 2px solid black;
+    width:150px;
+    padding: 4px;
+    background-color:rgb(218, 228, 85);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.stats
+{
+    
+    background-color:rgb(68, 186, 190);
+    width:200px;
+    margin-top:10px;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: right;
+    
+}
+
+.ElementStats
+{
+    display: flex;
+    padding: 4px;
+    justify-content: right;
+
+    margin-left:100px;
+
+    
+
+}
+
+.statsPower, .statsNinjutsu, .statsTaijutsu, .statsGenjutsu, .statsLife
+{
+
+    display: flex;
+    margin-top:10px;
+    text-align: left;
+   
+    flex-direction: column;
+
 }

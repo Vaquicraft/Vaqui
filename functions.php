@@ -67,18 +67,8 @@ function menu()
     $req->execute([$login]);
     $perso = $req->fetch();
     $perso = $perso['selected_perso'];
-    
-    echo $_SESSION['login'];
+    include('base.html');
     current_perso_stats();
-    echo'<html> <link rel="stylesheet" href="style.css" /> <title> Naruto Project </title> </html>';
-    echo '<br /> <br />';
-	echo '<br /><a href="membre.php">Accueil</a>';
-	echo '<br /><a href="perso.php">Persos</a>';
-	echo '<br /><a href="histoire.php">Mode Histoire</a>';
-    echo '<br /><a href="training.php">Entraînements</a>';
-	echo '<br /><a href="tchat.php">Tchat</a>';
-	echo '<br /><a href="deconnexion.php">Se déconnecter</a><br /><br />';
-    
 }
 	
 
@@ -204,19 +194,18 @@ function list_perso_stats()
 
 function perso_stats()
 {
-    global $login, $pdo, $data_mh_step, $power, $data_list_persos, $perso;
+    global $login, $pdo, $data_mh_step, $power, $data_list_persos, $perso, $data_perso;
     check_session();
-    // mh_step();
     $req = $pdo->prepare("SELECT * FROM persos WHERE name_perso = ? AND owner_perso = ?");
     $req->execute([$perso, $login]);
     $data_perso = $req->fetch();
-    echo '<br /><br /><br /><br /><b>' . $data_perso['name_perso'] . '</b>';    
-    echo '<br />Puissance : ' . power($data_perso);  
-    echo '<br />Ninjutsu : ' . $data_perso['nin_perso'];
-    echo '<br />Taijutsu : ' . $data_perso['tai_perso'];
-    echo '<br />Genjutsu : ' . $data_perso['gen_perso'];
-    echo '<br />Vie : ' . $data_perso['life_perso'];
-    echo '<br /><br />';
+    // echo '<br /><br /><br /><br /><b>' . $data_perso['name_perso'] . '</b>';    
+    // echo '<br />Puissance : ' . power($data_perso);  
+    // echo '<br />Ninjutsu : ' . $data_perso['nin_perso'];
+    // echo '<br />Taijutsu : ' . $data_perso['tai_perso'];
+    // echo '<br />Genjutsu : ' . $data_perso['gen_perso'];
+    // echo '<br />Vie : ' . $data_perso['life_perso'];
+    // echo '<br /><br />';
 }
 
 
