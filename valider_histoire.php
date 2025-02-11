@@ -1,24 +1,16 @@
 <?php
 require 'functions.php';
-check_login();
-bdd_connexion();
+check_session();
 menu();
-power();
+power($name_perso);
 mh_step();
 current_perso_stats();
 
-$req = $pdo->prepare("
-SELECT users.*, mh_steps.*
-FROM users
-INNER JOIN mh_steps ON users.selected_perso= mh_steps.mh_perso
-WHERE users.login = ?
-");
-$req->execute([($login)]);
-$data_selected_perso = $req->fetch();
-$data_selected_perso = $data_selected_perso['selected_perso'];
-if (empty($data_selected_perso))
+$current_perso = $data_mh_step['mh_perso'];
+// $current_perso = $current_perso_data['selected_perso'];
+if ($perso !== $current_perso)
 {
-    echo 'Vous devez utiliser ' . $data_selected_perso . ' pour cette étape.';
+    echo 'Vous devez utiliser ' . $data_mh_step['mh_perso'] . ' pour cette étape.';
     die;
 }
 

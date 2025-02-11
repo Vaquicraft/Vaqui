@@ -1,7 +1,6 @@
 <?php
 require 'functions.php';
-check_login();
-bdd_connexion();
+check_session();
 menu();
 
 $req = $pdo->prepare("
@@ -74,8 +73,7 @@ function increase_stats()
     global $pdo, $login, $nin, $tai, $gen, $perso_id, $data_perso, $id_perso;
     
     // Vérifier la connexion et la session
-    check_login();
-    bdd_connexion();
+    check_session();
 
     $name_perso = $_GET['perso'];
     

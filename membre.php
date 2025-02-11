@@ -2,7 +2,7 @@
 
 require 'functions.php';
 
-check_login();
+check_session();
 menu();
 
 

@@ -62,12 +62,12 @@ else
 	$passwordverif = $_POST['passwordverif'];
 	$mail = $_POST['mail'];
 			
-	$req = $pdo->prepare('INSERT INTO users(login, password, mail, date_inscription, mh_step, selected_perso) VALUES(:login, :password, :mail, NOW(), :mh_step, :selected_perso)');
+	$req = $pdo->prepare('INSERT INTO users(login, password, mail, date_inscription, user_mh_step, selected_perso) VALUES(:login, :password, :mail, NOW(), :user_mh_step, :selected_perso)');
 	$req->execute(array(
 		'login' => $login,
 		'password' => $pass_hache,
 		'mail' => $mail,
-		'mh_step' => 1,
+		'user_mh_step' => 1,
 		'selected_perso' => "Naruto"
 	));
 

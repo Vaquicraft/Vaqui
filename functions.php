@@ -28,9 +28,46 @@ catch(Exception $e)
   }
 }
 
+function check_session()
+{
+    global $selected_perso, $pdo, $req, $data, $login;
+    check_login();
+    bdd_connexion();
+    if (isset($_SESSION['selected_perso']))
+            {
+                $selected_perso = $_SESSION['selected_perso'];
+            }
+    else
+    {
+        $req = $pdo->prepare("SELECT * FROM users WHERE login = ?");
+        $req->execute([$login]);
+        $data = $req->fetch();
+        $name_perso = $data['selected_perso'];
+        $_SESSION['selected_perso'] = $name_perso;
+    }
+}
+
+
+function getUserData()
+{
+    global $login, $pdo, $user_data;
+    check_session();
+    $req = $pdo->prepare("SELECT * FROM users WHERE login = ?");
+    $req->execute([$login]);
+    $user_data = $req->fetch();
+}
+
 
 function menu()
 {
+    global $selected_perso, $req, $pdo, $perso;
+    check_session();
+    global $pdo, $req, $perso, $name_perso, $login;
+    $req = $pdo->prepare("SELECT * FROM users WHERE login = ?");
+    $req->execute([$login]);
+    $perso = $req->fetch();
+    $perso = $perso['selected_perso'];
+    
     echo $_SESSION['login'];
     current_perso_stats();
     echo'<html> <link rel="stylesheet" href="style.css" /> <title> Naruto Project </title> </html>';
@@ -47,25 +84,35 @@ function menu()
 
 function mh_step()
 {
-    global $data_mh_step, $pdo, $login;
-    check_login();
-    bdd_connexion();
+    global $data_mh_step, $pdo, $login, $user_data;
+    check_session();
+    getUserData();
+
+    if (!isset($user_data) || !isset($user_data['user_mh_step'])) {
+        die("Erreur : user_mh_step non défini dans user_data.");
+    }
 
     $req = $pdo->prepare("
-    SELECT users.*, mh_steps.*
+    SELECT users.*, mh_steps.*, persos.*
     FROM users
-    INNER JOIN mh_steps ON users.mh_step = mh_steps.mh_step
-    WHERE users.login = ?
+    INNER JOIN mh_steps ON users.user_mh_step = mh_steps.mh_step
+    INNER JOIN persos ON users.login = persos.owner_perso
+    WHERE users.login = ? AND users.user_mh_step = ?
     ");
-    $req->execute(array($login));
+    $req->execute(array($login, $user_data['user_mh_step']));
     $data_mh_step = $req->fetch();
+
+    if (!$data_mh_step)
+    {
+        echo '<br /><h2>Mode Histoire</h2>';
+        die("La suite très bientôt.. Ou pas !");
+    }
 }
 
 function new_perso()
 {
     global $pdo, $login, $data_mh_step;
-    check_login();
-    bdd_connexion();
+    check_session();
     mh_step();
   
     $req = $pdo->prepare
@@ -96,37 +143,40 @@ function new_perso()
     ]);
 }
 
-function power()
+function power($name_perso)
 {
-    check_login();
-    bdd_connexion();
-    global $pdo, $login, $power, $data, $perso;
+    check_session();
+    global $pdo, $login, $power, $data, $perso, $name_perso;
 
-    $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso=?");
-    $req->execute(array($login));
-    $data=$req->fetch();
-    $pts_nin = $data['nin_perso'] * 1.1;
-    $pts_tai = $data['tai_perso'] * 1.1;
-    $pts_gen = $data['gen_perso'] * 1.1;
-    $pts_life = $data['life_perso'] * 0.01;
+    if (!isset($name_perso))
+    {
+        $name_perso = $_SESSION['selected_perso'];
+    }  
+
+    $req = $pdo->prepare("SELECT * FROM persos WHERE name_perso = ? AND owner_perso = ?");
+    $req->execute([$name_perso, $login]);
+    $data_perso = $req->fetch();
+
+
+    $pts_nin = $data_perso['nin_perso'] * 1.1;
+    $pts_tai = $data_perso['tai_perso'] * 1.1;
+    $pts_gen = $data_perso['gen_perso'] * 1.1;
+    $pts_life = $data_perso['life_perso'] * 0.01;
     $power = $pts_nin + $pts_tai + $pts_gen + $pts_life;
     $power = $power + 10;
     return $power;
+   
 }
-
-
-
-
-
 
 
 
 function current_perso_stats()
 {
-    global $current_perso_data, $pdo, $login, $power, $perso;
-    check_login();
-    bdd_connexion();
-    power();
+    global $current_perso_data, $pdo, $login, $power, $perso, $selected_perso, $name_perso;
+    check_session();
+    $name_perso = $_SESSION['selected_perso'];
+    
+    power($name_perso);
     
     $req = $pdo->prepare("
     SELECT users.*, persos.*
@@ -136,6 +186,7 @@ function current_perso_stats()
     ");
     $req->execute(array($login));
     $perso = $req->fetch();
+    $perso = $perso['selected_perso'];
 
     perso_stats();
 }
@@ -143,8 +194,7 @@ function current_perso_stats()
 function list_perso_stats()
 {
     global $pdo, $login, $perso, $persos;
-    check_login();
-    bdd_connexion();
+    check_session();
     $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso=?");
     $req->execute([($login)]);
     $persos=$req->fetchAll();
@@ -152,41 +202,29 @@ function list_perso_stats()
 }
 
 
-
-
-
 function perso_stats()
 {
     global $login, $pdo, $data_mh_step, $power, $data_list_persos, $perso;
-    check_login();
-    bdd_connexion();
-    mh_step();
-    echo '<br /><br /><br /><br /><b>' . $perso['selected_perso'] . '</b>';    
-    echo '<br />Puissance : ' . $power;  
-    echo '<br />Ninjutsu : ' . $perso['nin_perso'];
-    echo '<br />Taijutsu : ' . $perso['tai_perso'];
-    echo '<br />Genjutsu : ' . $perso['gen_perso'];
-    echo '<br />Vie : ' . $perso['life_perso'];
+    check_session();
+    // mh_step();
+    $req = $pdo->prepare("SELECT * FROM persos WHERE name_perso = ? AND owner_perso = ?");
+    $req->execute([$perso, $login]);
+    $data_perso = $req->fetch();
+    echo '<br /><br /><br /><br /><b>' . $data_perso['name_perso'] . '</b>';    
+    echo '<br />Puissance : ' . power($data_perso);  
+    echo '<br />Ninjutsu : ' . $data_perso['nin_perso'];
+    echo '<br />Taijutsu : ' . $data_perso['tai_perso'];
+    echo '<br />Genjutsu : ' . $data_perso['gen_perso'];
+    echo '<br />Vie : ' . $data_perso['life_perso'];
     echo '<br /><br />';
 }
 
 
-
-
-
-
-
-
-
-
-
-
 function current_mh_perso_stats()
 {
-    global $current_perso_data, $pdo, $login, $power, $data_mh_step;
-    check_login();
-    bdd_connexion();
-    power();
+    global $current_perso_data, $pdo, $login, $power, $data_mh_step, $name_perso;
+    check_session();
+    power($name_perso);
     mh_step();
 
 
@@ -198,13 +236,12 @@ function current_mh_perso_stats()
 function enemy_mh_stats()
 {
     global $enemy, $pdo, $login;
-    check_login();
-    bdd_connexion();
+    check_session();
     
     $req = $pdo->prepare("
     SELECT users.*, mh_steps.*
     FROM users
-    INNER JOIN mh_steps ON users.mh_step = mh_steps.mh_step
+    INNER JOIN mh_steps ON users.user_mh_step = mh_steps.mh_step
     WHERE users.login = ?
     ");
     $req->execute([($login)]);
@@ -217,11 +254,10 @@ function enemy_mh_stats()
 
 function mh_fight_process()
 {
-    global $pdo, $login, $power, $current_perso_mh_data, $enemy;
-    check_login();
-    bdd_connexion();
+    global $pdo, $login, $power, $current_perso_mh_data, $enemy, $name_perso;
+    check_session();
     mh_step();
-    power();
+    power($name_perso);
     if ($power >= $enemy['mh_power'])
     {
         echo 'Vous avez remporté le combat !<br /><br />';
@@ -237,18 +273,14 @@ function mh_fight_process()
 function mh_process_win()
 {
     global $login, $pdo, $reward1, $reward2, $reward3, $data_mh_step;
-    check_login();
-    bdd_connexion();
+    check_session();
     mh_step();
     $reward1 = $data_mh_step['mh_reward_1'];
     echo 'Vous avez obtenu le personnage ' . $reward1;
     new_perso();
-    $req = $pdo->prepare("UPDATE users SET mh_step = mh_step + 1 WHERE login = ?");
+    $req = $pdo->prepare("UPDATE users SET user_mh_step = user_mh_step + 1 WHERE login = ?");
     $req->execute([($login)]);
-    
-
 }
-
 
 
 

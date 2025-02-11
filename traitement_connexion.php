@@ -1,7 +1,9 @@
 <?php
 require 'functions.php';
-bdd_connexion();
 check_login();
+bdd_connexion();
+check_session();
+
 
 
 	$hache = sha1($_POST['passwordco']);			   

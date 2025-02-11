@@ -1,9 +1,8 @@
 <?php
 require 'functions.php';
-check_login();
-bdd_connexion();
+check_session();
 menu();
-power();
+
     
     
 
@@ -28,6 +27,7 @@ power();
             $req = $pdo->prepare("UPDATE users SET selected_perso = ? WHERE login = ?");
             $req->execute([$modified, $login]);
             header("Location: " . $_SERVER['PHP_SELF']);
+            $_SESSION['selected_perso'] = $modified;
         }
         }
         
@@ -37,8 +37,9 @@ power();
 
   
 
+        $name_perso = $perso['name_perso'];
         echo '<a href="perso.php?perso=' . $perso['name_perso'] . '"><b><br /><br /><br /><br />' . $perso['name_perso'] . '</b></a>'; 
-        echo '<br />Puissance : ' . $power;  
+        echo '<br />Puissance : ' . power($name_perso);  
         echo '<br />Ninjutsu : ' . $perso['nin_perso'];
         echo '<br />Taijutsu : ' . $perso['tai_perso'];
         echo '<br />Genjutsu : ' . $perso['gen_perso'];
