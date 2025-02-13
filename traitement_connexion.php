@@ -2,9 +2,6 @@
 require 'functions.php';
 check_login();
 bdd_connexion();
-check_session();
-
-
 
 	$hache = sha1($_POST['passwordco']);			   
 	$req=$pdo->prepare('SELECT * FROM users WHERE login=?');
@@ -14,6 +11,7 @@ check_session();
 	if (!$donnees || !password_verify($_POST['passwordco'], $donnees['password']))
 	{
 		echo 'Mauvais identifants <html> <br /> <a href="index.php">Retour </html>';
+		// todo fix
 	}
 		
 	else

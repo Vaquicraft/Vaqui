@@ -15,7 +15,6 @@ if (session_status() == PHP_SESSION_NONE)
 	<body>
 	
 			 <a href="inscription.php">S'inscrire</a>
-			 <a href="test.php">Page de test</a>
 	
 	<header>
 <center> <h1> <b> Naruto Project </center> </h1> </b> <br />

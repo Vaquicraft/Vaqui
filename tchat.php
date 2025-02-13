@@ -1,6 +1,6 @@
 <?php
 
-include("menu.php");
-
+getUserData();
+menu();
 
 ?>

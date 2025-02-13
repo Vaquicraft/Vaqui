@@ -1,11 +1,9 @@
-<?php
+    <?php
 
-require 'functions.php';
+    require 'functions.php';
 
-check_session();
-menu();
+    getUserData();
+    menu();
 
-
-
-?>
+    ?>
 

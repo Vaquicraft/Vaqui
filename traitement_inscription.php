@@ -22,7 +22,7 @@ $req->execute(array($_POST['login']));
 $donnees=$req->fetch();
 if (!empty($donnees))
 {
-	echo "<html> <center> Ce nom d'utilisateur est déjà utilisé. </center> <br /> </html>";
+	echo "<h2> Ce nom d'utilisateur est déjà utilisé.</h2> </html>";
 	die;
 }
 
@@ -31,25 +31,25 @@ $req->execute(array($_POST['mail']));
 $donnees=$req->fetch();
 if (!empty($donnees))
 {
-	echo "<html> <center> Cette adresse mail est déjà utilisée. </center> <br /> </html>";
+	echo "<html> <h2> Cette adresse mail est déjà utilisée.</h2> </html>";
 	die;
 }
 
 if (strlen($_POST['login']) <= 3)
 {
-	echo "<html> <center> Votre pseudo est trop court. (4 caractères minimum). </center> <br /> </html>";
+	echo "<html> <h2> Votre pseudo est trop court. (4 caractères minimum).</h2> </html>";
 	die;
 }
 
 if (strlen($_POST['password']) <= 6 || $_POST['password'] != $_POST['passwordverif'])
 {
-	echo "<html> <center> Votre mot de passe invalide ou trop court. (7 caractères minimum). </center> <br /> </html>";
+	echo "<html> <h2> Votre mot de passe invalide ou trop court. (7 caractères minimum). </h2> </html>";
 	die;
 }
 
 if (!preg_match("#^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#", $_POST['mail']))
 {
-	echo "<html> <center> Votre adresse mail est invalide. </center> <br /> </html>";
+	echo "<html> <h2> Votre adresse mail est invalide.</h2> </html>";
 	die;
 }
 
@@ -99,7 +99,7 @@ else
 			'training_life' => 0
 		]);
 
-	echo "<html> <center> Votre inscription s'est déroulée avec succès ! </center> <br /> </html>";
+	echo "<html> <h2> Votre inscription s'est déroulée avec succès ! <h2> </html>";
 	echo '<html> <center><a href="index.php">Cliquez ici pour vous connecter</a></center> <br /> </html>';
 }
 
