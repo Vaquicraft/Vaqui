@@ -2,7 +2,21 @@
     box-sizing: border-box;
 }
 
-h2
+a
+{
+    color: black;
+    text-decoration: none;
+    padding: 3px;
+}
+
+a:hover
+{
+    background-color: #35999c;
+    border-radius: 10px;
+    /* border: 2px solid black; */
+}
+
+h1, h2, h3
 {
     display: flex;
     justify-content: center;
@@ -17,6 +31,13 @@ ul
 body
 {
 background-color: #C9F0F2;
+}
+
+footer
+{
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 .links
@@ -59,25 +80,18 @@ background-color: #C9F0F2;
 
 }
 
-a
+/* a
 {
-     display: flex;
+    display: flex;
     justify-content: center;
     text-align: center;
     align-items: center;
     color: black;
     text-decoration: none;
-    /* border-radius: 10px;
-    margin: auto; */
-    /* border: 2px solid black; */
-    /* padding:3px; */
-}
+    
+} */
 
-a:hover
-{
-    background-color: #35999c;
-    border: 2px solid black;
-}
+
 
 
 .pseudo
@@ -220,4 +234,98 @@ a:hover
     flex-direction: column;
     margin-bottom: 20px;
 
+}
+
+
+.fightBuilderSlide, .fightContent
+{
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+
+
+
+    border: 0px solid black;
+}
+
+.fightBuilderSlide > div > p
+{
+    margin: 0 0px;
+    border: 1px solid black;
+    
+}
+
+
+
+.fightContent > div 
+{
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content:center;
+    border: 0px solid black;
+    margin-top: 5px;
+
+    
+}
+
+.fightContentSlideLogin, .fightBuilderSlideLogin
+{
+    width: 150px;
+
+}
+
+.fightContentSlideName, .fightBuilderSlideName
+{
+    width: 150px;
+
+}
+
+.fightContentSlidePower, .fightBuilderSlidePower
+{
+    width: 100px;
+
+}
+
+.fightContentSlideWin, .fightBuilderSlideWin, .fightContentSlideLose, .fightBuilderSlideLose, .fightContentSlideKill, .fightBuilderSlideKill, .fightContentSlideDraw, .fightBuilderSlideDraw, .fightContentSlideLevel, .fightBuilderSlideLevel
+{
+    width: 75px;
+
+}
+
+.fightContentSlideFightButton, .fightBuilderSlideFightButton
+{
+    width: 75px;
+}
+
+.fightIntroBox
+{
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content:center;    
+}
+
+
+.headerMenu
+{
+    display: flex;
+
+
+}
+
+
+.headerMenuCurrentPersoStats
+{
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content:center; 
+    order: -1;
+}
+
+.headerMenuLinks
+{
+    margin-left: 575px;
 }

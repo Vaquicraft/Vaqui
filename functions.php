@@ -65,11 +65,59 @@ function getUserData()
 
 function menu()
 {
-    global $pdo, $perso, $name_perso, $login;
-    check_session();
+    global $pdo, $perso, $name_perso, $login, $dataPerso, $dataUser;
     getUserData();
-    include('base.html');
-    persoBuilder();   
+    require('base.html');
+    
+    ?>
+    <div class="headerMenu">
+        <div class="headerMenuLinks">
+            <nav class="links">
+                <ul>
+                    <li>
+                        <img src="images/home.png" alt="home_icon">
+                        <a href="membre.php">Accueil</a>
+                    </li>
+
+                    <li>
+                        <img src="images/perso.png" alt="home_icon">
+                        <a href="perso.php">Persos</a>  
+                    </li>
+                    
+                    <li>
+                        <img src="images/fist.png" alt="home_icon">
+                        <a href="fight.php">Combats</a>  
+                    </li>
+
+                    <li>
+                        <img src="images/mh.png" alt="home_icon">
+                        <a href="histoire.php">Mode Histoire</a>  
+                    </li>
+                    
+                    <li>
+                        <img src="images/training.png" alt="home_icon">
+                        <a href="training.php">Entraînements</a>
+                    </li>
+
+                    <!-- <li><a href="tchat.php">Tchat</a></li> -->
+
+                        <li>
+                            <img src="images/logout.png" alt="home_icon">
+                            <a href="deconnexion.php">Se déconnecter</a>
+                        </li>
+            
+                </ul>
+            </nav>
+        </div>
+        <div class="headerMenuCurrentPersoStats">
+            <?php
+            $dataPerso = $dataUser;
+            persoBuilder($dataPerso); 
+            ?>
+        </div>
+    </div>
+    <?php
+
 }
 	
 
@@ -80,14 +128,15 @@ function new_perso()
   
     $req = $pdo->prepare
     ('
-        INSERT INTO persos (owner_perso, name_perso, xp_perso, nin_perso, tai_perso, gen_perso, life_perso, avatar_perso, win, lose, draw, kills, deaths, training_nin, training_tai, training_gen, training_life)
-        VALUES (:owner_perso, :name_perso, :xp_perso, :nin_perso, :tai_perso, :gen_perso, :life_perso, :avatar_perso, :win, :lose, :draw, :kills, :deaths, :training_nin, :training_tai, :training_gen, :training_life)
+        INSERT INTO persos (owner_perso, name_perso, power_perso, xp_perso, nin_perso, tai_perso, gen_perso, life_perso, avatar_perso, win, lose, draw, kills, deaths, training_nin, training_tai, training_gen, training_life)
+        VALUES (:owner_perso, :name_perso, :power_perso, :xp_perso, :nin_perso, :tai_perso, :gen_perso, :life_perso, :avatar_perso, :win, :lose, :draw, :kills, :deaths, :training_nin, :training_tai, :training_gen, :training_life)
     ');
 
     $req->execute
     ([
         'owner_perso' => $login,
         'name_perso' => $dataUser['mh_reward_1'],
+        'power_perso' => 10,
         'xp_perso' => 0,
         'nin_perso' => 0,
         'tai_perso' => 0,
@@ -106,35 +155,44 @@ function new_perso()
     ]);
 }
 
-function power()
+
+
+
+function updatePower($idPerso)
 {
-    global $pdo, $login, $power, $data, $perso, $persoName, $dataUser;
+    global $pdo;
     getUserData();
-    if (!isset($name_perso))
-    {
-        $name_perso = $_SESSION['selected_perso'];
-    }  
-    $pts_nin = $dataUser['nin_perso'] * 1.1;
-    $pts_tai = $dataUser['tai_perso'] * 1.1;
-    $pts_gen = $dataUser['gen_perso'] * 1.1;
-    $pts_life = $dataUser['life_perso'] * 0.01;
+
+    $req = $pdo->prepare("SELECT * FROM persos WHERE id_perso = ?");
+    $req->execute([$idPerso]);
+    $dataPerso = $req->fetch();    
+
+    $pts_nin = $dataPerso['nin_perso'] * 1.1;
+    $pts_tai = $dataPerso['tai_perso'] * 1.1;
+    $pts_gen = $dataPerso['gen_perso'] * 1.1;
+    $pts_life = $dataPerso['life_perso'] * 0.01;
     $power = $pts_nin + $pts_tai + $pts_gen + $pts_life;
     $power = $power + 10;
-    return $power;
+
+    $req = $pdo->prepare("UPDATE persos SET power_perso = ? WHERE id_perso = ?");
+    $req->execute([$power, $idPerso]);
 }
 
-function persoBuilder()
+
+
+
+function persoBuilder($dataPerso)
 {
-    global $pdo, $login, $persos, $perso, $name_perso, $dataUser;
+    global $pdo, $login, $persos, $perso, $name_perso, $dataUser, $dataPerso;
     getUserData();
-    $name_perso = $dataUser['name_perso']; 
+    $idPerso = $dataPerso['id_perso'];
     ?>
 
     <div class="persoBuilderSlide">
 
         <div class="persoBuilderSlideNamePerso">
         <?php
-        persoStatsBuilderGetName();
+        echo '<a href="perso.php?perso=' . $dataPerso['name_perso'] . '">' . $dataPerso['name_perso'] . '</br></a>'; 
         ?>
         </div>
 
@@ -144,7 +202,7 @@ function persoBuilder()
             </div>
             <div class="persoBuilderSlideStatsPersoStatValue">
             <?php
-                persoStatsBuilderGetPower();
+                echo $dataPerso['power_perso']
             ?>
             </div>
         </div>
@@ -155,7 +213,7 @@ function persoBuilder()
             </div>
             <div class="persoBuilderSlideStatsPersoStatValue">
             <?php
-                persoStatsBuilderGetNinjutsu();
+                echo $dataPerso['nin_perso'];
             ?>
             </div>
         </div>
@@ -166,7 +224,7 @@ function persoBuilder()
             </div>
             <div class="persoBuilderSlideStatsPersoStatValue">
             <?php
-                persoStatsBuilderGetTaijutsu();
+                echo $dataPerso['tai_perso'];
             ?>
             </div>
         </div>
@@ -177,7 +235,7 @@ function persoBuilder()
             </div>
             <div class="persoBuilderSlideStatsPersoStatValue">
             <?php
-                persoStatsBuilderGetTaijutsu();
+                echo $dataPerso['gen_perso'];
             ?>
             </div>
         </div>
@@ -188,7 +246,7 @@ function persoBuilder()
             </div>
             <div class="persoBuilderSlideStatsPersoStatValue">
             <?php
-                persoStatsBuilderGetLife();
+                echo $dataPerso['life_perso'];
             ?>
             </div>
         </div>
@@ -196,52 +254,8 @@ function persoBuilder()
 
 
 <?php
+return $dataPerso;
 }
-
-
-
-function persoStatsBuilderGetName()
-{
-    global $perso, $dataUser;
-    echo '<a href="perso.php?perso=' . $dataUser['name_perso'] . '">' . $dataUser['name_perso'] . '</br></a>'; 
-}
-
-function persoStatsBuilderGetPower()
-{
-    global $dataUser;
-    getUserData();
-    echo power($dataUser['name_perso']);
-}
-
-function persoStatsBuilderGetNinjutsu()
-{
-    global $dataUser;
-    getUserData();
-    echo $dataUser['nin_perso'];
-}
-
-function persoStatsBuilderGetTaijutsu()
-{
-    global $dataUser;
-    getUserData();
-    echo $dataUser['tai_perso'];
-}
-
-function persoStatsBuilderGetGenjutsu()
-{
-    global $dataUser;
-    getUserData();
-    echo $dataUser['gen_perso'];
-}
-
-function persoStatsBuilderGetLife()
-{
-    global $dataUser;
-    getUserData();
-    echo $dataUser['life_perso'];
-}
-
-
 
 function increase_stats()
 {
@@ -253,9 +267,173 @@ function increase_stats()
     $genjutsu = $dataUser['gen_perso'] + $gen;
     
     echo 'Votre entraînement a porté ses fruits !';
-    $req = $pdo->prepare("UPDATE persos SET nin_perso = ?, tai_perso = ?, gen_perso = ? WHERE name_perso = ? AND owner_perso = ?");
-    $success = $req->execute([$ninjutsu, $taijutsu, $genjutsu, $dataUser['name_perso'], $login]);    
+    ##todo réparer le echo kimarchpa
 
+    $req = $pdo->prepare("UPDATE persos SET nin_perso = ?, tai_perso = ?, gen_perso = ? WHERE name_perso = ? AND owner_perso = ?");
+    $req->execute([$ninjutsu, $taijutsu, $genjutsu, $dataUser['name_perso'], $login]);    
+
+}
+
+
+function checkMhStep()
+{
+    global $login, $dataUser;
+    getUserData();
+    if ($dataUser['mh_perso'] !== $dataUser['selected_perso'])
+{
+
+
+
+    echo 'Vous devez utiliser <a href="perso.php?perso=' . $dataUser['mh_perso'] . '">' . $dataUser['mh_perso'] . ' pour cette étape.</a>'; 
+    die;
+}
+}
+
+
+function fightBuilderPage()
+{
+    getUserData();
+}   
+
+
+function levelPerso($xp) 
+{
+    $level = 1;
+    $xpRequired = 50;
+
+    while ($xp >= $xpRequired) {
+        $xp -= $xpRequired; 
+        $level++; 
+        $xpRequired = 200 + (160 * ($level - 1)) + (5 * pow(($level - 1), 2));
+
+    }
+    return $level;
+}
+
+function fightProcess($fightResult)
+{
+    global $pdo, $fightResult, $dataFighter, $dataAdversary;
+    bdd_connexion();
+    
+    $fighterWin = 0;
+    $fighterLose = 0;
+    $fighterDraw = 0;
+    $fighterKills = 0;
+    $fighterDeaths = 0;
+
+    $adversaryWin = 0;
+    $adversaryLose = 0;
+    $adversaryDraw = 0;
+    $adversaryKills = 0;
+    $adversaryDeaths = 0;
+
+    $dataFighterWin = $dataFighter['win'];
+    $dataFighterLose = $dataFighter['lose'];
+    $dataFighterDraw = $dataFighter['draw'];
+    $dataFighterKills = $dataFighter['kills'];
+    $dataFighterDeaths = $dataFighter['deaths'];
+    $dataFighterXP = $dataFighter['xp_perso'];
+
+    $dataAdversaryWin = $dataAdversary['win'];
+    $dataAdversaryLose = $dataAdversary['lose'];
+    $dataAdversaryDraw = $dataAdversary['draw'];
+    $dataAdversaryKills = $dataAdversary['kills'];
+    $dataAdversaryDeaths = $dataAdversary['deaths'];
+    $dataAdversaryXP = $dataAdversary['xp_perso'];
+
+
+    switch ($fightResult)
+    {
+        case "fighterWin":
+            $xp = $dataFighter['xp_perso'];
+            $xpFighter = xpCalc($xp);
+            $xp = $dataAdversary['xp_perso'];
+            $xpAdversary = xpCalc($xp) * 0.25;
+            $fighterWin = 1;
+            $adversaryLose = 1;
+      
+            break;
+        case "adversaryWin":
+            $xp = $dataFighter['xp_perso'];
+            $xpFighter = xpCalc($xp) * 0.25;
+            $xp = $dataAdversary['xp_perso'];
+            $xpAdversary = xpCalc($xp);
+            $adversaryWin = 1;
+            $fighterLose = 1;
+            break;
+        case "doubleKill":
+            $xp = $dataFighter['xp_perso'];
+            $xpFighter = xpCalc($xp) * 0.25;
+            $xp = $dataAdversary['xp_perso'];
+            $xpAdversary = xpCalc($xp) * 0.25;
+            $fighterLose = 1;
+            $fighterKills = 1;
+            $fighterDeaths = 1;
+            $adversaryLose = 1;
+            $adversaryKills = 1;
+            $adversaryDeaths = 1;
+            
+            break;
+        case "fighterKilled":
+            $xp = $dataFighter['xp_perso'];
+            $xpFighter = xpCalc($xp) * 0.2;
+            $xp = $dataAdversary['xp_perso'];
+            $xpAdversary = xpCalc($xp) * 1.15;
+            $adversaryKills = 1;
+            $adversaryWin = 1;
+            $fighterLose = 1;
+            $fighterDeaths = 1;
+            break;
+        case "adversaryKilled":
+            $xp = $dataFighter['xp_perso'];
+            $xpFighter = xpCalc($xp) * 1.15;
+            $xp = $dataAdversary['xp_perso'];
+            $xpAdversary = xpCalc($xp) * 0.2;
+            $fighterWin = 1;
+            $fighterKills = 1;
+            $adversaryLose = 1;
+            $adversaryDeaths = 1;
+            break;
+        case "draw":
+            $xp = $dataFighter['xp_perso'];
+            $xpFighter = xpCalc($xp) * 0.3;
+            $xp = $dataAdversary['xp_perso'];
+            $xpAdversary = xpCalc($xp) * 0.3;
+            $fighterDraw = 1;
+            $adversaryDraw = 1;
+            break;
+    
+    }
+
+    $xpFighter = $dataFighterXP + $xpFighter;
+    $fighterWin = $dataFighterWin + $fighterWin;
+    $fighterLose = $dataFighterLose + $fighterLose;
+    $fighterDraw = $dataFighterDraw + $fighterDraw;
+    $fighterKills = $dataFighterKills + $fighterKills;
+    $fighterDeaths = $dataFighterDeaths + $fighterDeaths;
+
+    $xpAdversary = $dataAdversaryXP + $xpAdversary;
+    $adversaryWin = $dataAdversaryWin + $adversaryWin;
+    $adversaryLose = $dataAdversaryLose + $adversaryLose;
+    $adversaryDraw = $dataAdversaryDraw + $adversaryDraw;
+    $adversaryKills = $dataAdversaryKills + $adversaryKills;
+    $adversaryDeaths = $dataAdversaryDeaths + $adversaryDeaths;
+
+    $req = $pdo->prepare("UPDATE persos SET xp_perso = ?, win = ?, lose = ?, draw = ?, kills = ?, deaths = ? WHERE id_perso = ?");
+    $req->execute([$xpFighter, $fighterWin, $fighterLose, $fighterDraw, $fighterKills, $fighterDeaths, $dataFighter['id_perso']]); 
+    $req->execute([$xpAdversary, $adversaryWin, $adversaryLose, $adversaryDraw, $adversaryKills, $adversaryDeaths, $dataAdversary['id_perso']]);
+}
+
+
+function xpCalc($xp) 
+{
+    global $level, $xp;
+    $level = levelPerso($xp);
+    if ($level <= 0) {
+        return 0; 
+    }
+    
+    return pow(1, ($level - 1)) + (1 * (log($level) * 1.75) + 19 );
 }
 
 ?>

@@ -9,120 +9,12 @@
 <body>
 
     <header>
-        <nav class="links">
-            <ul>
-                <li>
-                    <img src="images/home.png" alt="home_icon">
-                    <a href="membre.php">Accueil</a>
-                </li>
-                    
         
             
-                
-                <li>
-                    <img src="images/perso.png" alt="home_icon">
-                    <a href="perso.php">Persos</a>  
-                </li>
-                
-   
-                <li>
-                    <img src="images/mh.png" alt="home_icon">
-                    <a href="histoire.php">Mode Histoire</a>  
-                </li>
-             
-                
-           
 
-                
-                <li>
-                    <img src="images/training.png" alt="home_icon">
-                    <a href="training.php">Entraînements</a>
-                </li>
-                    
-             
-                
-
-                <!-- <li><a href="tchat.php">Tchat</a></li> -->
-
-                    <li>
-                        <img src="images/logout.png" alt="home_icon">
-                        <a href="deconnexion.php">Se déconnecter</a>
-                    </li>
-
-            
-                           
-              
-                
-            </ul>
-            
-
-        </nav>
     </header>
-    <div class="pseudo">
-        <div class="welcome">
-            Bienvenue
-        </div> 
-        <div class="welcome">
-            <h4> <?php 
-                echo '  ' . $_SESSION['login']; 
-                ?> </h4>
-        </div>
-    </div>
-    <!-- <div class="currentPersoStats">
-        <div class="statsName">
-            <?php 
-            global $login, $pdo, $data_mh_step, $power, $data_list_persos, $perso, $data_perso;
-            check_session();
-            $req = $pdo->prepare("SELECT * FROM persos WHERE name_perso = ? AND owner_perso = ?");
-            $req->execute([$perso, $login]);
-            $data_perso = $req->fetch();
-            echo $data_perso['name_perso'];
-            ?>
-        </div>
-        <div class="stats">
-            <div class="statsPower">
-                Puissance :
-                <div class="ElementStats">
-                    <?php
-                    echo power($data_perso);
-                ?>
-                </div>
-        
-            </div>
 
-            <div class="statsNinjutsu">
-                Ninjutsu :
-                <div class="ElementStats">
-                    <?php
-                echo $data_perso['nin_perso'];
-                ?>
-                </div>
-                
-            </div>
-            <div class="statsTaijutsu">
-                Taijutsu :
-                <div class="ElementStats">
-                    <?php
-                echo $data_perso['tai_perso'];
-                ?>
-                </div>
-            </div>
-            <div class="statsGenjutsu">
-                Genjutsu :
-                <div class="ElementStats">
-                    <?php
-                echo $data_perso['gen_perso'];
-                ?>
-                </div>
-            </div>
-            <div class="statsLife">
-                Vie :
-                <div class="ElementStats">
-                    <?php
-                echo $data_perso['life_perso'];
-                ?>
-                </div>
-            </div> -->
+  
             
         </div>
     </div>

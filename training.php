@@ -3,13 +3,13 @@ require 'functions.php';
 getUserData();
 menu();
 
-    $trainingPerso = $dataUser['selected_perso'];
-    echo '<a href="training.php?perso=' . $trainingPerso . '&training=1">Entraînement de Ninjutsu (+1) (1h00)</a><br />';
-    echo '<a href="training.php?perso=' . $trainingPerso . '&training=2">Entraînement de Taijutsu (+1) (1h30)</a><br />';
-    echo '<a href="training.php?perso=' . $trainingPerso . '&training=3">Entraînement de Genjutsu (+1) (2h00)</a><br />';
+    $trainingPerso = $_SESSION['selected_perso'];
+    echo '<a href="training.php?training=1">Entraînement de Ninjutsu (+1) (1h00)</a><br />';
+    echo '<a href="training.php?training=2">Entraînement de Taijutsu (+1) (1h30)</a><br />';
+    echo '<a href="training.php?training=3">Entraînement de Genjutsu (+1) (2h00)</a><br />';
     echo '<br /><br />';
-    echo '<a href="training.php?perso=' . $trainingPerso . '&training=4">Entraînement complet (+1 de chaque) (4h00)</a><br />';
-    echo '<a href="training.php?perso=' . $trainingPerso . '&training=5">Entraînement intensif (+4 de chaque) (12h00)</a><br />';
+    echo '<a href="training.php?training=4">Entraînement complet (+1 de chaque) (4h00)</a><br />';
+    echo '<a href="training.php?training=5">Entraînement intensif (+4 de chaque) (12h00)</a><br />';
 
 
 if(isset($_GET['training']))
@@ -22,31 +22,26 @@ if(isset($_GET['training']))
                 $nin = 1;
                 $tai = 0;
                 $gen = 0;
-                increase_stats();
                 break;
             case 2:
                 $nin = 0;
                 $tai = 1;
                 $gen = 0;
-                increase_stats();
                 break;
             case 3:
                 $nin = 0;
                 $tai = 0;
                 $gen = 1;
-                increase_stats();
                 break;
             case 4:
                 $nin = 1;
                 $tai = 1;
                 $gen = 1;
-                increase_stats();
                 break;
             case 5:
                 $nin = 4;
                 $tai = 4;
                 $gen = 4;
-                increase_stats();
                 break;
             default:
                 break;    
@@ -57,7 +52,9 @@ if(isset($_GET['training']))
 
 
 
-increase_stats();
-
+if (isset($_GET['training'])) {
+    header("Location: " . strtok($_SERVER["REQUEST_URI"], '?') . "");
+    increase_stats();
+}
 
 ?>

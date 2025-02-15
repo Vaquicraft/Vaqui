@@ -3,16 +3,6 @@ require 'functions.php';
 menu();
 getUserData();
 
-
-
-
-
-
-
-
-
-    
-    
     echo  '<h2>Gestion des personnages de ' . $login . '</h2>';
 
   ?>
@@ -50,7 +40,8 @@ getUserData();
       
 
       <?php
-      persoBuilder();
+      $dataPerso = $perso;
+      persoBuilder($dataPerso);
       ?>
  
      

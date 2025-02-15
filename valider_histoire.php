@@ -2,18 +2,12 @@
 require 'functions.php';
 getUserData();
 menu();
-power($name_perso);
 
 
 
-if ($dataUser['mh_perso'] !== $dataUser['selected_perso'])
-{
-    echo 'Vous devez utiliser ' . $dataUser['mh_perso'] . ' pour cette étape.';
-    die;
+checkMhStep();
 
-}
-
-
+$power = $dataUser['power_perso'];
 echo '<h2>Mode Histoire - Combat</h2>';
 echo '' . $dataUser['mh_perso'];    
 echo '<br />Puissance : ' . $power;  
