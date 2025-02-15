@@ -22,8 +22,6 @@ $req = $pdo->prepare("SELECT * FROM persos WHERE id_perso = ?");
 $req->execute([$_GET['id']]);
 $dataAdversary = $req->fetch();
 
-
-
 ?>
 
 <?php
@@ -33,31 +31,30 @@ $dataAdversary = $req->fetch();
     <div class="fightIntroBoxWinner">
         <?php
         $dataPerso = $dataFighter;
-        persoBuilder($dataPerso);
+        persoBuilderOther($dataPerso);
         ?>
     
     </div>
+    <div class="returnButtonFight">
+        <a href="fight.php">Retour à la liste des combats</a>
+    </div>
+    
     
     <div class="fightIntroBoxLooser">
         <?php
         $dataPerso = $dataAdversary;
-        persoBuilder($dataPerso);
-        
-
-
-
-
+        persoBuilderOther($dataPerso);
         ?>
     
     </div>
 </div>
 
-    
-<?php
+    <div class="fightProcessFinal">
+    <?php
     
     echo '<h2>Résultat du Combat</h2>';
-    echo '<p>L\'attaquant attaque avec une puissance de ' . $dataFighter['power_perso'] . '</p>';
-    echo '<p>Le défenseur défend avec une puissance de ' . $dataAdversary['power_perso'] . '</p>';
+    echo '<p>' .$dataFighter['owner_perso'] . ' (' . $dataFighter['name_perso'] . ') attaque avec une puissance de ' . $dataFighter['power_perso'] . '</p>';
+    echo '<p>' .$dataAdversary['owner_perso'] . ' (' . $dataAdversary['name_perso'] . ') défend avec une puissance de ' . $dataAdversary['power_perso'] . '</p>';
 
     if ($dataFighter['power_perso'] > $dataAdversary['life_perso'] && $dataAdversary['power_perso'] > $dataFighter['life_perso'] )
     {
@@ -70,18 +67,18 @@ $dataAdversary = $req->fetch();
     if ($dataFighter['power_perso'] > $dataAdversary['power_perso'] )
     {
         $damage = $dataFighter['power_perso'] - $dataAdversary['power_perso'];
-        echo '<p>Le défenseur encaisse ' . $damage . ' points de dégâts</p>';
+        echo '<p>' .$dataAdversary['owner_perso'] . ' (' . $dataAdversary['name_perso'] . ') encaisse ' . $damage . ' points de dégâts</p>';
 
         if ($dataAdversary['life_perso'] <= $damage)
         {
-            echo '<p>' . $dataAdversary['name_perso'] . ' (' . $dataAdversary['owner_perso'] . ') n\'a pas survécu au combat.</p>';
+            echo '<p>' . $dataAdversary['owner_perso'] . ' (' . $dataAdversary['name_perso'] . ') n\'a pas survécu au combat.</p>';
             $fightResult = "adversaryKilled";
             fightProcess($fightResult);
             exit;
         }
         else
         {
-            echo '<p>' . $dataFighter['name_perso'] . ' (' . $dataFighter['owner_perso'] . ') a gagné le combat.</p>';
+            echo '<p>' . $dataFighter['owner_perso'] . ' (' . $dataFighter['name_perso'] . ') a gagné le combat.</p>';
             $fightResult = "fighterWin";
             fightProcess($fightResult);
             exit;
@@ -96,7 +93,6 @@ $dataAdversary = $req->fetch();
         exit;
     }
     
-
     else
     {
         {
@@ -105,14 +101,14 @@ $dataAdversary = $req->fetch();
 
             if ($dataFighter['life_perso'] <= $damage)
         {
-            echo '<p>' . $dataFighter['name_perso'] . ' (' . $dataFighter['owner_perso'] . ') n\'a pas survécu au combat.</p>';
+            echo '<p>' . $dataFighter['owner_perso'] . ' (' . $dataFighter['name_perso'] . ') n\'a pas survécu au combat.</p>';
             $fightResult = "fighterKilled";
         fightProcess($fightResult);
             exit; 
         }
         else
         {
-            echo '<p>' . $dataAdversary['name_perso'] . ' (' . $dataAdversary['owner_perso'] . ') a gagné le combat.</p>';
+            echo '<p>' . $dataAdversary['owner_perso'] . ' (' . $dataAdversary['name_perso'] . ') a gagné le combat.</p>';
             $fightResult = "aversaryWin";
         fightProcess($fightResult);
             exit;
@@ -120,6 +116,9 @@ $dataAdversary = $req->fetch();
         }
     }
     ?> 
+    
+    </div>
+
 
 <div class="fightIntroBox">
     

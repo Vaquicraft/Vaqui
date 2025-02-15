@@ -33,12 +33,7 @@ body
 background-color: #C9F0F2;
 }
 
-footer
-{
-    min-height: 100%;
-    display: flex;
-    justify-content: center;
-}
+            /* ##### LINKS ##### */
 
 .links
 {
@@ -46,6 +41,11 @@ footer
     width:200px;
     border-radius: 20px;
     padding:3px;
+    /* position: fixed;
+    bottom: 0;
+    left:43%;
+    margin-left: 20px;
+    margin-bottom: 20px; */
     
 }
 
@@ -55,7 +55,6 @@ footer
     justify-content: center;
     align-items:center;
     margin-bottom:10px;
-
     margin-left:-30px;
     
 
@@ -80,70 +79,10 @@ footer
 
 }
 
-/* a
-{
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    align-items: center;
-    color: black;
-    text-decoration: none;
-    
-} */
 
+/* ##### PERSO STATS BUILDER ##### */
 
-
-
-.pseudo
-{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 10px;
-    margin-top:-10px;
-}
-
-.welcome
-{
-    margin: 0 1px;
-}
-
-.statsName
-{
-    margin: 0 20px;
-    border: 2px solid black;
-    width:150px;
-    padding: 4px;
-    background-color:rgb(218, 228, 85);
-    border-radius: 10px;
-    text-align: center;
-}
-
-.stats
-{
-    
-    background-color:rgb(68, 186, 190);
-    width:200px;
-    margin-top:10px;
-    border-radius: 10px;
-    padding: 10px;
-    text-align: right;
-    
-}
-
-.ElementStats
-{
-    display: flex;
-    padding: 4px;
-    justify-content: right;
-
-    margin-left:100px;
-
-    
-
-}
-
-.statsPower, .statsNinjutsu, .statsTaijutsu, .statsGenjutsu, .statsLife
+/* .statsPower, .statsNinjutsu, .statsTaijutsu, .statsGenjutsu, .statsLife
 {
 
     display: flex;
@@ -151,7 +90,7 @@ footer
     text-align: left;
     flex-direction: column;
 
-}
+} */
 
 .persoBuilderSlide
 {
@@ -164,7 +103,11 @@ footer
     background-color:rgb(245, 237, 169);
     border: 2px solid rgb(97, 28, 28);
     padding: 10px;
-    margin: 0 10px;
+    /* position: fixed;
+    bottom: 0;
+    left:0; */
+    margin-left: 20px;
+    margin-bottom: 20px;
 
     flex-direction: column;
 }
@@ -174,8 +117,7 @@ footer
     border: 2px solid black;
     border-radius: 10px;
     padding: 5px;
-    background-color:rgb(244, 247, 203);
-    
+    background-color:rgb(244, 247, 203); 
 }
 
 
@@ -190,15 +132,12 @@ footer
     display: flex;
     align-items: center;
     text-align: center;
-
-
     padding: 2px;
 }
 
 .persoBuilderSlideStatsPersoStatValue
 {
     background-color:rgb(194, 236, 227);
-
     padding: 5px;
     border-radius: 10px;
     display: flex;
@@ -211,6 +150,8 @@ footer
     align-items: center;
     text-align: center;
 }
+
+/* ##### SUBRSCRIBE ##### */
 
 
 .inscription > input
@@ -237,6 +178,8 @@ footer
 }
 
 
+/* ##### FIGHTS ##### */
+
 .fightBuilderSlide, .fightContent
 {
     display: flex;
@@ -255,8 +198,6 @@ footer
     border: 1px solid black;
     
 }
-
-
 
 .fightContent > div 
 {
@@ -288,15 +229,11 @@ footer
 
 }
 
-.fightContentSlideWin, .fightBuilderSlideWin, .fightContentSlideLose, .fightBuilderSlideLose, .fightContentSlideKill, .fightBuilderSlideKill, .fightContentSlideDraw, .fightBuilderSlideDraw, .fightContentSlideLevel, .fightBuilderSlideLevel
+.fightContentSlideWin, .fightBuilderSlideWin, .fightContentSlideLose, .fightBuilderSlideLose, .fightContentSlideKill, .fightBuilderSlideKill, .fightContentSlideDraw, .fightBuilderSlideDraw, .fightContentSlideLevel, .fightBuilderSlideLevel, .fightContentSlideFightButton, .fightBuilderSlideFightButton
+
 {
     width: 75px;
 
-}
-
-.fightContentSlideFightButton, .fightBuilderSlideFightButton
-{
-    width: 75px;
 }
 
 .fightIntroBox
@@ -307,25 +244,22 @@ footer
     justify-content:center;    
 }
 
-
-.headerMenu
-{
-    display: flex;
-
-
-}
-
-
-.headerMenuCurrentPersoStats
+.fightProcessFinal
 {
     display: flex;
     align-items: center;
     text-align: center;
-    justify-content:center; 
-    order: -1;
+    justify-content:center;
+    background-color:rgb(221, 220, 146);
+    flex-direction: column;
+    width: 300px;
+    margin-left: 42%;
+    margin-top: 20px;
 }
 
-.headerMenuLinks
+.returnButtonFight
 {
-    margin-left: 575px;
+    background-color: antiquewhite;
+    position: fixed;
+    bottom: 0;
 }

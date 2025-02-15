@@ -67,57 +67,10 @@ function menu()
 {
     global $pdo, $perso, $name_perso, $login, $dataPerso, $dataUser;
     getUserData();
-    require('base.html');
+    require('base.php');
+    $dataPerso = $dataUser;
+    persoBuilderCurrentPerso($dataPerso);
     
-    ?>
-    <div class="headerMenu">
-        <div class="headerMenuLinks">
-            <nav class="links">
-                <ul>
-                    <li>
-                        <img src="images/home.png" alt="home_icon">
-                        <a href="membre.php">Accueil</a>
-                    </li>
-
-                    <li>
-                        <img src="images/perso.png" alt="home_icon">
-                        <a href="perso.php">Persos</a>  
-                    </li>
-                    
-                    <li>
-                        <img src="images/fist.png" alt="home_icon">
-                        <a href="fight.php">Combats</a>  
-                    </li>
-
-                    <li>
-                        <img src="images/mh.png" alt="home_icon">
-                        <a href="histoire.php">Mode Histoire</a>  
-                    </li>
-                    
-                    <li>
-                        <img src="images/training.png" alt="home_icon">
-                        <a href="training.php">Entraînements</a>
-                    </li>
-
-                    <!-- <li><a href="tchat.php">Tchat</a></li> -->
-
-                        <li>
-                            <img src="images/logout.png" alt="home_icon">
-                            <a href="deconnexion.php">Se déconnecter</a>
-                        </li>
-            
-                </ul>
-            </nav>
-        </div>
-        <div class="headerMenuCurrentPersoStats">
-            <?php
-            $dataPerso = $dataUser;
-            persoBuilder($dataPerso); 
-            ?>
-        </div>
-    </div>
-    <?php
-
 }
 	
 
@@ -179,9 +132,29 @@ function updatePower($idPerso)
 }
 
 
+function persoBuilderCurrentPerso($dataPerso)
+{
+    global $pdo, $login, $persos, $perso, $name_perso, $dataUser, $dataPerso, $idPerso;
+    getUserData();
+    $idPerso = $dataPerso['id_perso'];
+    ?>
 
+    <div class="persoBuilderSlide">
 
-function persoBuilder($dataPerso)
+        <div class="persoBuilderSlideNamePerso">
+            <a href="perso.php?perso=<?= $dataPerso['name_perso']; ?>">
+                <?= $dataPerso['name_perso']; ?>
+            </a>
+        </div>
+        
+<?php
+persoBuilderGetStats();
+?>
+    </div>
+<?php
+}
+
+function persoBuilderOther($dataPerso)
 {
     global $pdo, $login, $persos, $perso, $name_perso, $dataUser, $dataPerso;
     getUserData();
@@ -191,70 +164,54 @@ function persoBuilder($dataPerso)
     <div class="persoBuilderSlide">
 
         <div class="persoBuilderSlideNamePerso">
-        <?php
-        echo '<a href="perso.php?perso=' . $dataPerso['name_perso'] . '">' . $dataPerso['name_perso'] . '</br></a>'; 
-        ?>
-        </div>
-
-        <div class="persoBuilderSlideStatsPerso">
-            <div class="persoBuilderSlideStatsPersoStatName">
-                Puissance :
-            </div>
-            <div class="persoBuilderSlideStatsPersoStatValue">
             <?php
-                echo $dataPerso['power_perso']
+            echo $dataPerso['name_perso'];
             ?>
-            </div>
         </div>
-
-        <div class="persoBuilderSlideStatsPerso">
-            <div class="persoBuilderSlideStatsPersoStatName">
-                Ninjutsu :
-            </div>
-            <div class="persoBuilderSlideStatsPersoStatValue">
-            <?php
-                echo $dataPerso['nin_perso'];
-            ?>
-            </div>
-        </div>
-
-        <div class="persoBuilderSlideStatsPerso">
-            <div class="persoBuilderSlideStatsPersoStatName">
-                Taijutsu :
-            </div>
-            <div class="persoBuilderSlideStatsPersoStatValue">
-            <?php
-                echo $dataPerso['tai_perso'];
-            ?>
-            </div>
-        </div>
-
-        <div class="persoBuilderSlideStatsPerso">
-            <div class="persoBuilderSlideStatsPersoStatName">
-                Genjutsu :
-            </div>
-            <div class="persoBuilderSlideStatsPersoStatValue">
-            <?php
-                echo $dataPerso['gen_perso'];
-            ?>
-            </div>
-        </div>
-
-        <div class="persoBuilderSlideStatsPerso">
-            <div class="persoBuilderSlideStatsPersoStatName">
-                Vie :
-            </div>
-            <div class="persoBuilderSlideStatsPersoStatValue">
-            <?php
-                echo $dataPerso['life_perso'];
-            ?>
-            </div>
-        </div>
-    </div>
-
-
+        
 <?php
-return $dataPerso;
+persoBuilderGetStats();
+?>
+</div>
+<?php
+}
+
+function persoBuilderGetStats()
+{
+    global $pdo, $dataPerso, $statName, $statValue, $stats;
+    getUserData();
+
+    $stats = 
+    [
+        "Puissance" => $dataPerso['power_perso'],
+        "Ninjutsu"  => $dataPerso['nin_perso'],
+        "Taijutsu"  => $dataPerso['tai_perso'],
+        "Genjutsu"  => $dataPerso['gen_perso'],
+        "Vie"       => $dataPerso['life_perso']
+    ];
+
+    foreach ($stats as $statName => $statValue)
+    {
+        ?>
+
+        <div class="persoBuilderSlideStatsPerso">
+
+            <div class="persoBuilderSlideStatsPersoStatName">
+                <?php
+                echo $statName;
+                ?>
+            </div>
+
+            <div class="persoBuilderSlideStatsPersoStatValue">
+                <?php
+                    echo $statValue;
+                ?>
+            </div>
+            
+        </div>
+        
+        <?php
+    }
 }
 
 function increase_stats()
@@ -422,6 +379,19 @@ function fightProcess($fightResult)
     $req = $pdo->prepare("UPDATE persos SET xp_perso = ?, win = ?, lose = ?, draw = ?, kills = ?, deaths = ? WHERE id_perso = ?");
     $req->execute([$xpFighter, $fighterWin, $fighterLose, $fighterDraw, $fighterKills, $fighterDeaths, $dataFighter['id_perso']]); 
     $req->execute([$xpAdversary, $adversaryWin, $adversaryLose, $adversaryDraw, $adversaryKills, $adversaryDeaths, $dataAdversary['id_perso']]);
+
+    $req = $pdo->prepare('
+    INSERT INTO combat (fighter_id, adversary_id) 
+    VALUES (:fighter_id, :adversary_id)
+');
+$req->execute([
+    ':fighter_id'   => $dataFighter['id_perso'], 
+    ':adversary_id' => $dataAdversary['id_perso']
+]);
+
+
+    
+
 }
 
 
@@ -434,6 +404,117 @@ function xpCalc($xp)
     }
     
     return pow(1, ($level - 1)) + (1 * (log($level) * 1.75) + 19 );
+}
+
+
+function fightList()
+{
+    echo '<h2>Liste des Combats </h2>';
+    ?>
+    <div class="fightBuilderSlide">
+        <div class="fightBuilderSlideLogin">
+            <p>Pseudo</p>
+        </div>
+        
+        <div class="fightBuilderSlideName">
+            <p>Personnage</p>
+        </div>
+
+        <div class="fightBuilderSlideLevel">
+            <p>Niveau</p>
+        </div>
+
+        <div class="fightBuilderSlideLevel">
+            <p>Puissance</p>
+        </div>
+
+        <div class="fightBuilderSlideWin">
+            <p>G</p>
+        </div>
+
+        <div class="fightBuilderSlideLose">
+            <p>P</p>
+        </div>
+
+        <div class="fightBuilderSlideKill">
+            <p>T</p>
+        </div>
+
+        <div class="fightBuilderSlideDraw">
+            <p>N</p>
+        </div>
+
+        <div class="fightBuilderSlideFightButton">
+            <p>Combattre</p>
+        </div>
+    </div>
+    <?php
+}
+
+function fightListBuilder()
+{
+    global $pdo, $fighter, $xp, $fightList;
+
+    ?>
+    
+    <div class="fightContent">
+            <div class="fightContentSlideLogin">
+                <?php
+                echo $fighter['owner_perso'];
+                ?>
+            </div>
+            
+            <div class="fightContentSlideName">
+            <?php
+                echo $fighter['name_perso'];
+                ?>
+            </div>
+
+            <div class="fightContentSlideLevel">
+            <?php
+                $xp = $fighter['xp_perso'];
+                echo levelPerso($xp);
+                ?>
+            </div>
+
+            <div class="fightContentSlidePower">
+            <?php
+                $idPerso = $fighter['id_perso'];
+                echo $fighter['power_perso']
+                ?>
+            </div>
+
+            <div class="fightContentSlideWin">
+            <?php
+                echo $fighter['win'];
+                ?>
+            </div>
+
+            <div class="fightContentSlideLose">
+            <?php
+                echo $fighter['lose'];
+                ?>
+            </div>
+
+            <div class="fightContentSlideKill">
+            <?php
+                echo $fighter['kills'];
+                ?>
+            </div>
+
+            <div class="fightContentSlideDraw">
+            <?php
+                echo $fighter['draw'];
+                ?>
+            </div>
+            <div class="fightContentSlideFightButton">
+            <?php
+           echo '<a href="fightprocess.php?id=' . $fighter['id_perso'] . '"><img src="images/fight.png" alt=""></a>'; 
+            ?>
+            
+            </div>
+    </div>
+<?php
 }
 
 ?>

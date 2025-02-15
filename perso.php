@@ -41,17 +41,14 @@ getUserData();
 
       <?php
       $dataPerso = $perso;
-      persoBuilder($dataPerso);
+      persoBuilderCurrentPerso($dataPerso);
       ?>
  
      
       <?php
     }
     ?>
-    
-
-    
-        
+  
   </div>
 
   
