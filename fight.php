@@ -21,7 +21,9 @@ menu();
     $levelPerso = levelPerso($xp);
 
     
-    $skip = false;
+
+    $fightCount = 0;
+    
     foreach ($fightList as $fighter)
     {
 
@@ -29,10 +31,14 @@ menu();
         {
             continue;
         }
+        $skip = false;
+        // $skipLevel = true;
+        
         
         $xp = $fighter['xp_perso'];
         $levelFighter = levelPerso($xp);
-        if ($levelPerso + 2 < $levelFighter)
+        
+        if ($levelPerso + 2 < $levelFighter || ($levelPerso - 2 > $levelFighter))
         {
             $skipLevel = true;
             
@@ -40,22 +46,11 @@ menu();
             {
                 continue;
             }
-      
         }
-        if ($levelPerso - 2 > $levelFighter)
-        {
-            $skipLevel = true;
-            
-            if ($skipLevel)
-            {
-                continue;
-            }
-      
-        }
-          
+        
 
 
-   
+        
         if(!empty($dataCombat))
         {
             foreach ($dataCombat as $value)
@@ -66,15 +61,22 @@ menu();
                     break;      
                 } 
             }    
+            if ($skip)
+            {
+                continue;
+                
+        
+            }
+            
         }
-        if ($skip)
-        {
-            continue;
-        }
+        $fightCount++;
+
+        
 
         $idPerso = $fighter['id_perso'];
         updatePower($idPerso);
         fightListBuilder();
     }
+    echo $fightCount;
 
 ?>
