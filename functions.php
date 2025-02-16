@@ -1,3 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naruto Project</title>
+    <link rel="stylesheet" href="/style.css" /> 
+</head>
+<body>
+    
+</body>
+</html>
+
 <?php
 function check_login()
 {
@@ -67,7 +80,7 @@ function menu()
 {
     global $pdo, $perso, $name_perso, $login, $dataPerso, $dataUser, $datareq;
     getUserData();
-    require('base.php');
+    links();
 
     $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso = ? AND name_perso = ?");
     $req->execute([$login, $dataUser['selected_perso']]);
@@ -518,6 +531,139 @@ function fightListBuilder()
             </div>
     </div>
 <?php
+}
+
+function getFights($displayFightList)
+{
+    global $fightCount, $pdo, $login, $dataUser, $fighter, $skip, $skipLevel, $levelPerso, $levelFighter, $fightList, $req, $dataCombat, $xp, $idPerso;
+    getUserData();
+    $req = 'SELECT * FROM persos ORDER BY xp_perso DESC';
+    $req = $pdo->prepare($req);
+    $req->execute();
+    $fightList = $req->fetchAll();
+
+    $req = 'SELECT * FROM combat WHERE fighter_id = ?';
+    $req = $pdo->prepare($req);
+    $req->execute([$dataUser['id_perso']]);
+    $dataCombat = $req->fetchAll();
+
+    if ($displayFightList == true)
+    {
+        fightList();
+
+    }
+    
+    $xp = $dataUser['xp_perso'];
+    $levelPerso = levelPerso($xp);
+
+    
+
+    $fightCount = 0;
+    
+    foreach ($fightList as $fighter)
+    {
+
+        if ($fighter['owner_perso'] == $login)
+        {
+            continue;
+        }
+        $skip = false;
+        // $skipLevel = true;
+        
+        
+        $xp = $fighter['xp_perso'];
+        $levelFighter = levelPerso($xp);
+        
+        if ($levelPerso + 2 < $levelFighter || ($levelPerso - 2 > $levelFighter))
+        {
+            $skipLevel = true;
+            
+            if ($skipLevel)
+            {
+                continue;
+            }
+        }
+        
+
+
+        
+        if(!empty($dataCombat))
+        {
+            foreach ($dataCombat as $value)
+            {
+                if ($fighter['id_perso'] == $value['adversary_id'])
+                {
+                    $skip = true;
+                    break;      
+                } 
+            }    
+            if ($skip)
+            {
+                continue;
+                
+        
+            }
+            
+        }
+        $fightCount++;
+        $idPerso = $fighter['id_perso'];
+        updatePower($idPerso);
+        if ($displayFightList == true)
+        {
+            fightListBuilder();
+        }
+        
+
+    }
+    
+
+    return $fightCount;
+}
+
+function links()
+{
+    global $fightCount, $displayFightList;
+    $displayFightList = false;
+    getFights($displayFightList);
+?>
+
+<nav class="links">
+            <ul>
+                <li>
+                    <img src="images/home.png" alt="home_icon">
+                    <a href="membre.php">Accueil</a>
+                </li>
+                <li>
+                    <img src="images/perso.png" alt="home_icon">
+                    <a href="perso.php">Persos</a>  
+                </li>
+                
+                <li>
+                    <img src="images/fist.png" alt="home_icon">
+                    <?php
+                    echo '<a href="fight.php"> Combats (<span style="color:red; font-weight:bold">' . $fightCount . '</span>) </a>';
+
+                    ?>
+               
+                </li>
+                <li>
+                    <img src="images/mh.png" alt="home_icon">
+                    <a href="histoire.php">Mode Histoire</a>  
+                </li>
+                
+                <li>
+                    <img src="images/training.png" alt="home_icon">
+                    <a href="training.php">Entraînements</a>
+                </li>
+                <li>
+                    <img src="images/logout.png" alt="home_icon">
+                    <a href="deconnexion.php">Se déconnecter</a>
+                </li>
+        
+            </ul>
+        </nav>
+
+        <?php
 }
 
 ?>
