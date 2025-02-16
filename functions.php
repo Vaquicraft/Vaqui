@@ -65,11 +65,15 @@ function getUserData()
 
 function menu()
 {
-    global $pdo, $perso, $name_perso, $login, $dataPerso, $dataUser;
+    global $pdo, $perso, $name_perso, $login, $dataPerso, $dataUser, $datareq;
     getUserData();
     require('base.php');
-    $dataPerso = $dataUser;
+
+    $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso = ? AND name_perso = ?");
+    $req->execute([$login, $dataUser['selected_perso']]);
+    $dataPerso=$req->fetch();
     persoBuilderCurrentPerso($dataPerso);
+    
     
 }
 	
@@ -136,7 +140,6 @@ function persoBuilderCurrentPerso($dataPerso)
 {
     global $pdo, $login, $persos, $perso, $name_perso, $dataUser, $dataPerso, $idPerso;
     getUserData();
-    $idPerso = $dataPerso['id_perso'];
     ?>
 
     <div class="persoBuilderSlide">
@@ -241,7 +244,7 @@ function checkMhStep()
 
 
 
-    echo 'Vous devez utiliser <a href="perso.php?perso=' . $dataUser['mh_perso'] . '">' . $dataUser['mh_perso'] . ' pour cette étape.</a>'; 
+    echo 'Vous devez utiliser <a href="perso.php?perso=' . $dataUser['mh_perso'] . '">' . $dataUser['mh_perso'] . '</a> pour cette étape.'; 
     die;
 }
 }
