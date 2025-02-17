@@ -14,8 +14,8 @@ echo '<h2>Combat !</h2>';
 
 $currentPerso = $_SESSION['selected_perso'];
 
-$req = $pdo->prepare("SELECT * FROM persos WHERE name_perso = ?");
-$req->execute([$_SESSION['selected_perso']]);
+$req = $pdo->prepare("SELECT * FROM persos WHERE name_perso = ? AND owner_perso = ?");
+$req->execute([$_SESSION['selected_perso'], $login]);
 $dataFighter = $req->fetch();
 
 $req = $pdo->prepare("SELECT * FROM persos WHERE id_perso = ?");

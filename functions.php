@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/style.css" /> 
 </head>
 <body>
-    
+   
 </body>
 </html>
 
@@ -80,12 +80,32 @@ function menu()
 {
     global $pdo, $perso, $name_perso, $login, $dataPerso, $dataUser, $datareq;
     getUserData();
-    links();
-
+    ?>
+    <div class="baseFramePage">
+    <?php
+    ?>
+        <nav class="links2">
+        <?php
+        links();
+        ?>
+        </nav>
+        
+    <?php
+    ?>
+    <footer>
+    <?php
     $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso = ? AND name_perso = ?");
     $req->execute([$login, $dataUser['selected_perso']]);
     $dataPerso=$req->fetch();
     persoBuilderCurrentPerso($dataPerso);
+    ?>
+</footer>
+
+</div>
+    <?php
+    
+
+    
     
     
 }
@@ -155,13 +175,17 @@ function persoBuilderCurrentPerso($dataPerso)
     getUserData();
     ?>
 
-    <div class="persoBuilderSlide">
+    <div class="persoBuilder">
 
-        <div class="persoBuilderSlideNamePerso">
+        <div class="persoBuilderName">
             <a href="perso.php?perso=<?= $dataPerso['name_perso']; ?>">
                 <?= $dataPerso['name_perso']; ?>
             </a>
         </div>
+
+    
+            <img class="persoAvatar" src="images/Sakura.png" alt"">
+        
         
 <?php
 persoBuilderGetStats();
@@ -194,40 +218,47 @@ persoBuilderGetStats();
 
 function persoBuilderGetStats()
 {
-    global $pdo, $dataPerso, $statName, $statValue, $stats;
+    global $pdo, $dataPerso, $statName, $statValue, $stats, $xp, $level;
     getUserData();
 
+    $xp = $dataPerso['xp_perso'];
     $stats = 
     [
+        "Niveau" => $dataPerso['xp_perso'],
         "Puissance" => $dataPerso['power_perso'],
         "Ninjutsu"  => $dataPerso['nin_perso'],
         "Taijutsu"  => $dataPerso['tai_perso'],
         "Genjutsu"  => $dataPerso['gen_perso'],
-        "Vie"       => $dataPerso['life_perso']
     ];
 
+        
     foreach ($stats as $statName => $statValue)
     {
         ?>
-
-        <div class="persoBuilderSlideStatsPerso">
-
-            <div class="persoBuilderSlideStatsPersoStatName">
+        <div class="persoBuilderStats">
+            <div class="persoBuilderStatsName">
                 <?php
                 echo $statName;
                 ?>
             </div>
 
-            <div class="persoBuilderSlideStatsPersoStatValue">
+            <div class="persoBuilderStatsValue">
                 <?php
-                    echo $statValue;
+                if ($statName == "Niveau")
+                {
+                    echo ' : ' . levelPerso($xp) . ' (' . $xp . ' xp)';
+                }
+                else
+                {
+                    echo ' : ' . $statValue;
+                }
+                
                 ?>
             </div>
-            
         </div>
-        
-        <?php
+    <?php
     }
+
 }
 
 function increase_stats()
@@ -627,21 +658,27 @@ function links()
     getFights($displayFightList);
 ?>
 
-<nav class="links">
+<!-- <nav class="links"> -->
             <ul>
                 <li>
                     <img src="images/home.png" alt="home_icon">
                     <a href="membre.php">Accueil</a>
                 </li>
+                
                 <li>
                     <img src="images/perso.png" alt="home_icon">
-                    <a href="perso.php">Persos</a>  
+                    <a href="perso.php">Info Perso</a>  
+                </li>
+
+                <li>
+                    <img src="images/perso.png" alt="home_icon">
+                    <a href="listpersos.php">Liste des Persos</a>  
                 </li>
                 
                 <li>
                     <img src="images/fist.png" alt="home_icon">
                     <?php
-                    echo '<a href="fight.php"> Combats (<span style="color:red; font-weight:bold">' . $fightCount . '</span>) </a>';
+                    echo '<a href="fight.php"> Combats (<span style="color:white">' . $fightCount . '</span>) </a>';
 
                     ?>
                
@@ -657,11 +694,11 @@ function links()
                 </li>
                 <li>
                     <img src="images/logout.png" alt="home_icon">
-                    <a href="deconnexion.php">Se déconnecter</a>
+                    <a href="deconnexion.php">Déconnexion</a>
                 </li>
         
             </ul>
-        </nav>
+        <!-- </nav> -->
 
         <?php
 }
