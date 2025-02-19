@@ -6,7 +6,7 @@ getUserData();
 <div class="baseFramePage">
     <?php
     ?>
-        <nav class="links2">
+        <nav class="links">
         <?php
         links();
         ?>
@@ -19,7 +19,8 @@ getUserData();
     $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso = ? AND name_perso = ?");
     $req->execute([$login, $dataUser['selected_perso']]);
     $dataPerso=$req->fetch();
-    persoBuilderCurrentPerso($dataPerso);
+    $persoBuilderDisplayValue = "link";
+    persoBuilder($dataPerso, $persoBuilderDisplayValue);
     ?>
 </footer>
 

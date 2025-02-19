@@ -61,59 +61,72 @@ function check_session()
 
 function getUserData()
 {
-    global $login, $pdo, $dataUser, $data_perso, $selected_perso;
+    global $login, $pdo, $globalDataUser, $globalDataStory, $globalDataPerso;
     check_session();
-    $req = $pdo->prepare("
-    SELECT users.*, persos.*, mh_steps.*
-    FROM users
-    INNER JOIN persos ON users.selected_perso = persos.name_perso
-    INNER JOIN mh_steps ON users.user_mh_step = mh_steps.mh_step
-    WHERE users.login = ?
-    AND users.selected_perso = ?
+
+    $req=$pdo->prepare("
+    SELECT persos.*, users.*
+    FROM persos 
+    INNER JOIN users ON persos.owner_perso = users.login
+    WHERE persos.owner_perso = ?
     ");
-    $req->execute([$login, $selected_perso]);
-    $dataUser = $req->fetch();
+    $req->execute([$login]);
+    $globalDataUser=$req->fetch();
+
+    $req = $pdo->prepare("
+    SELECT persos.*, users.*
+    FROM users 
+    INNER JOIN persos ON persos.name_perso = users.selected_perso
+    WHERE selected_perso = ?
+    AND owner_perso = ?");
+    $req->execute([$globalDataUser['selected_perso'], $login]);
+    $globalDataPerso = $req->fetch();
+
+    $req=$pdo->prepare("
+    SELECT users.*, mh_steps.*
+    FROM users 
+    INNER JOIN mh_steps ON mh_steps.mh_step = users.user_mh_step
+    WHERE users.user_mh_step = ?
+    ");
+    $req->execute([$globalDataUser['user_mh_step']]);
+    $globalDataStory=$req->fetch();
 }
 
 
 function menu()
 {
-    global $pdo, $perso, $name_perso, $login, $dataPerso, $dataUser, $datareq;
+    global $pdo;
     getUserData();
     ?>
-    <div class="baseFramePage">
+    <nav class="links">
     <?php
+    links();
     ?>
-        <nav class="links2">
-        <?php
-        links();
-        ?>
-        </nav>
-        
+    </nav>
     <?php
+}
+
+function footer()
+{
+    global $pdo, $dataPerso, $persoBuilderDisplayValue, $login, $globalDataUser;
+    getUserData();
     ?>
     <footer>
+        <?php
+        $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso = ? AND name_perso = ?");
+        $req->execute([$login, $globalDataUser['selected_perso']]);
+        $dataPerso=$req->fetch();
+        $persoBuilderDisplayValue = "noLink";
+        persoBuilder($dataPerso, $persoBuilderDisplayValue);
+        ?>
+    </footer>
     <?php
-    $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso = ? AND name_perso = ?");
-    $req->execute([$login, $dataUser['selected_perso']]);
-    $dataPerso=$req->fetch();
-    persoBuilderCurrentPerso($dataPerso);
-    ?>
-</footer>
-
-</div>
-    <?php
-    
-
-    
-    
-    
 }
-	
+
 
 function new_perso()
 {
-    global $pdo, $login, $dataUser;
+    global $pdo, $login, $globalDataUser, $globalDataStory;
     getUserData();
   
     $req = $pdo->prepare
@@ -125,7 +138,7 @@ function new_perso()
     $req->execute
     ([
         'owner_perso' => $login,
-        'name_perso' => $dataUser['mh_reward_1'],
+        'name_perso' => $globalDataStory['mh_reward_1'],
         'power_perso' => 10,
         'xp_perso' => 0,
         'nin_perso' => 0,
@@ -148,73 +161,168 @@ function new_perso()
 
 
 
-function updatePower($idPerso)
+function updatePower($globalDataPerso)
 {
-    global $pdo;
+    global $pdo, $globalDataPerso;
     getUserData();
-
-    $req = $pdo->prepare("SELECT * FROM persos WHERE id_perso = ?");
-    $req->execute([$idPerso]);
-    $dataPerso = $req->fetch();    
-
-    $pts_nin = $dataPerso['nin_perso'] * 1.1;
-    $pts_tai = $dataPerso['tai_perso'] * 1.1;
-    $pts_gen = $dataPerso['gen_perso'] * 1.1;
-    $pts_life = $dataPerso['life_perso'] * 0.01;
+    $pts_nin = $globalDataPerso['nin_perso'] * 1.1;
+    $pts_tai = $globalDataPerso['tai_perso'] * 1.1;
+    $pts_gen = $globalDataPerso['gen_perso'] * 1.1;
+    $pts_life = $globalDataPerso['life_perso'] * 0.01;
     $power = $pts_nin + $pts_tai + $pts_gen + $pts_life;
     $power = $power + 10;
-
     $req = $pdo->prepare("UPDATE persos SET power_perso = ? WHERE id_perso = ?");
-    $req->execute([$power, $idPerso]);
+    $req->execute([$power, $globalDataPerso['id_perso']]);
 }
 
-
-function persoBuilderCurrentPerso($dataPerso)
+function xpCalc($xp) 
 {
-    global $pdo, $login, $persos, $perso, $name_perso, $dataUser, $dataPerso, $idPerso;
-    getUserData();
-    ?>
-
-    <div class="persoBuilder">
-
-        <div class="persoBuilderName">
-            <a href="perso.php?perso=<?= $dataPerso['name_perso']; ?>">
-                <?= $dataPerso['name_perso']; ?>
-            </a>
-        </div>
-
+    global $level, $xp;
+    $level = levelPerso($xp);
+    if ($level <= 0) {
+        return 0; 
+    }
     
-            <img class="persoAvatar" src="images/Sakura.png" alt"">
-        
-        
-<?php
-persoBuilderGetStats();
-?>
-    </div>
-<?php
+    return pow(1, ($level - 1)) + (1 * (log($level) * 1.75) + 19 );
 }
 
-function persoBuilderOther($dataPerso)
+
+
+function persoBuilder($dataPerso, $persoBuilderDisplayValue)
 {
-    global $pdo, $login, $persos, $perso, $name_perso, $dataUser, $dataPerso;
+    global $pdo, $login, $persos, $perso, $name_perso, $globalDataUser, $dataPerso, $idPerso, $persoBuilderDisplayValue, $avatar;
     getUserData();
-    $idPerso = $dataPerso['id_perso'];
+    updatePower($dataPerso)
     ?>
-
-    <div class="persoBuilderSlide">
-
-        <div class="persoBuilderSlideNamePerso">
-            <?php
-            echo $dataPerso['name_perso'];
-            ?>
-        </div>
+    <div class="persoBuilder">
+        <div class="persoBuilderName">
         
-<?php
-persoBuilderGetStats();
-?>
-</div>
-<?php
+            <?php
+            if ($persoBuilderDisplayValue == "link")
+            {
+                ?> 
+                <a href="perso.php?perso=<?= $dataPerso['name_perso']; ?>">
+                    <?= $dataPerso['name_perso']; ?>
+                </a>
+                <?php
+            }
+            else
+            {
+                echo $dataPerso['name_perso'];
+            }
+            echo ' (' . $dataPerso['power_perso'] . ')';
+            ?>
+
+        </div>
+
+        <div class="persoBuilderMain">
+            <div class="persoBuilderMainStat">
+                <?php
+                persoBuilderGetStats();
+                ?>
+            </div>
+
+            <div class ="persoBuilderMainAvatar">
+                <?php
+                $selectedPerso = $dataPerso['name_perso'];
+                $selectedAvatar = $dataPerso['avatar_perso'];
+                $avatar = $selectedPerso . $selectedAvatar;
+                displayAvatar();
+                ?>
+            </div>
+
+
+            
+        </div>
+    </div>
+    <?php
+    
 }
+
+function persoBuilderStory()
+{
+    global $pdo, $login, $globalDataStory, $globalDataUser, $dataPerso, $persoBuilderDisplayValue, $avatar;
+    getUserData();
+    $dataPerso = $globalDataUser;
+    updatePower($dataPerso)
+    ?>
+    <div class="persoBuilder">
+        <div class="persoBuilderName">
+        
+            <?php
+           
+            echo $globalDataStory['mh_enemy'];
+           
+            echo ' (' . $globalDataStory['mh_power'] . ')';
+            ?>
+
+        </div>
+
+        <div class="persoBuilderMain">
+            <div class="persoBuilderMainStat">
+                <?php
+                
+    $statValue = "?";
+    $stats = 
+    [
+        "Niveau" => $statValue,
+        "XP" => $statValue,
+        "Ninjutsu"  => $statValue,
+        "Taijutsu"  => $statValue,
+        "Genjutsu"  => $statValue,
+    ];
+
+        
+    foreach ($stats as $statName => $statValue)
+    {
+        ?>
+        <div class="persoBuilderStats">
+            <div class="persoBuilderStatsName">
+                <?php
+                echo $statName;
+                ?>
+            </div>
+
+            <div class="persoBuilderStatsValue">
+                <?php
+                echo ' : ' . $statValue;
+                  
+                ?>
+            </div>
+        </div>
+    <?php
+    }
+
+                ?>
+            </div>
+
+            <div class ="persoBuilderMainAvatar">
+                <?php
+                $selectedPerso = $dataPerso['name_perso'];
+                $selectedAvatar = $dataPerso['avatar_perso'];
+                $avatar = $globalDataStory['mh_enemy'] . '1';
+                displayAvatar();
+                ?>
+            </div>
+
+
+            
+        </div>
+    </div>
+    <?php
+    
+}
+
+function displayAvatar()
+{
+    global $dataPerso, $globalDataUser, $pdo, $avatar;
+    getUserData();
+    ?>
+    <img class="persoAvatar" src="images/avatars/<?= $avatar ?>.jpeg" alt"">
+    <?php
+}
+
+
 
 function persoBuilderGetStats()
 {
@@ -224,8 +332,8 @@ function persoBuilderGetStats()
     $xp = $dataPerso['xp_perso'];
     $stats = 
     [
-        "Niveau" => $dataPerso['xp_perso'],
-        "Puissance" => $dataPerso['power_perso'],
+        "Niveau" => levelPerso($xp),
+        "XP" => $dataPerso['xp_perso'],
         "Ninjutsu"  => $dataPerso['nin_perso'],
         "Taijutsu"  => $dataPerso['tai_perso'],
         "Genjutsu"  => $dataPerso['gen_perso'],
@@ -244,15 +352,8 @@ function persoBuilderGetStats()
 
             <div class="persoBuilderStatsValue">
                 <?php
-                if ($statName == "Niveau")
-                {
-                    echo ' : ' . levelPerso($xp) . ' (' . $xp . ' xp)';
-                }
-                else
-                {
-                    echo ' : ' . $statValue;
-                }
-                
+                echo ' : ' . $statValue;
+                  
                 ?>
             </div>
         </div>
@@ -263,42 +364,54 @@ function persoBuilderGetStats()
 
 function increase_stats()
 {
-    global $pdo, $login, $nin, $tai, $gen, $dataUser;
+    global $pdo, $login, $nin, $tai, $gen, $globalDataUser, $globalDataPerso;
     getUserData();
     
-    $ninjutsu = $dataUser['nin_perso'] + $nin;
-    $taijutsu = $dataUser['tai_perso'] + $tai;
-    $genjutsu = $dataUser['gen_perso'] + $gen;
+    $ninjutsu = $globalDataPerso['nin_perso'] + $nin;
+    $taijutsu = $globalDataPerso['tai_perso'] + $tai;
+    $genjutsu = $globalDataPerso['gen_perso'] + $gen;
     
     echo 'Votre entraînement a porté ses fruits !';
     ##todo réparer le echo kimarchpa
 
     $req = $pdo->prepare("UPDATE persos SET nin_perso = ?, tai_perso = ?, gen_perso = ? WHERE name_perso = ? AND owner_perso = ?");
-    $req->execute([$ninjutsu, $taijutsu, $genjutsu, $dataUser['name_perso'], $login]);    
+    $req->execute([$ninjutsu, $taijutsu, $genjutsu, $globalDataPerso['name_perso'], $login]);    
 
 }
 
 
 function checkMhStep()
 {
-    global $login, $dataUser;
+    global $pdo, $login, $globalDataStory, $totalMHStep;
     getUserData();
-    if ($dataUser['mh_perso'] !== $dataUser['selected_perso'])
+    ##SECURITÉ
+    $req = "SELECT COUNT(*) AS total FROM mh_steps";
+    $req=$pdo->query($req);
+    $dataMH = $req->fetch();
+    $totalMHStep = $dataMH['total'];
+
+    if (!isset($globalDataStory['user_mh_step']))
+    {
+        echo "TRUETEST";
+        $req = $pdo->prepare("UPDATE users SET user_mh_step = ? WHERE login = ?");
+        $req->execute([$totalMHStep, $login]);   
+    }
+
+    if ($globalDataStory['mh_step'] == $totalMHStep)
+    {
+        echo "Vous avez terminé le MH (pour l'instant...) Félicitations.";
+        die;
+    }
+    ##SECURITÉ
+
+
+    if ($globalDataStory['mh_perso'] !== $globalDataStory['selected_perso'])
 {
-
-
-
-    echo 'Vous devez utiliser <a href="perso.php?perso=' . $dataUser['mh_perso'] . '">' . $dataUser['mh_perso'] . '</a> pour cette étape.'; 
+    echo 'Vous devez utiliser <a href="perso.php?perso=' . $globalDataStory['mh_perso'] . '">' . $globalDataStory['mh_perso'] . '</a> pour cette étape.'; 
     die;
 }
+
 }
-
-
-function fightBuilderPage()
-{
-    getUserData();
-}   
-
 
 function levelPerso($xp) 
 {
@@ -430,27 +543,13 @@ function fightProcess($fightResult)
     $req = $pdo->prepare('
     INSERT INTO combat (fighter_id, adversary_id) 
     VALUES (:fighter_id, :adversary_id)
-');
-$req->execute([
+    ');
+
+    $req->execute([
     ':fighter_id'   => $dataFighter['id_perso'], 
     ':adversary_id' => $dataAdversary['id_perso']
-]);
+    ]);
 
-
-    
-
-}
-
-
-function xpCalc($xp) 
-{
-    global $level, $xp;
-    $level = levelPerso($xp);
-    if ($level <= 0) {
-        return 0; 
-    }
-    
-    return pow(1, ($level - 1)) + (1 * (log($level) * 1.75) + 19 );
 }
 
 
@@ -566,7 +665,7 @@ function fightListBuilder()
 
 function getFights($displayFightList)
 {
-    global $fightCount, $pdo, $login, $dataUser, $fighter, $skip, $skipLevel, $levelPerso, $levelFighter, $fightList, $req, $dataCombat, $xp, $idPerso;
+    global $fightCount, $pdo, $login, $globalDataUser, $globalDataPerso, $fighter, $skip, $skipLevel, $levelPerso, $levelFighter, $fightList, $req, $dataCombat, $xp, $idPerso;
     getUserData();
     $req = 'SELECT * FROM persos ORDER BY xp_perso DESC';
     $req = $pdo->prepare($req);
@@ -575,7 +674,7 @@ function getFights($displayFightList)
 
     $req = 'SELECT * FROM combat WHERE fighter_id = ?';
     $req = $pdo->prepare($req);
-    $req->execute([$dataUser['id_perso']]);
+    $req->execute([$globalDataUser['id_perso']]);
     $dataCombat = $req->fetchAll();
 
     if ($displayFightList == true)
@@ -584,8 +683,9 @@ function getFights($displayFightList)
 
     }
     
-    $xp = $dataUser['xp_perso'];
+    $xp = $globalDataPerso['xp_perso'];
     $levelPerso = levelPerso($xp);
+    echo $globalDataPerso['xp_perso'];
 
     
 
@@ -638,7 +738,7 @@ function getFights($displayFightList)
         }
         $fightCount++;
         $idPerso = $fighter['id_perso'];
-        updatePower($idPerso);
+        
         if ($displayFightList == true)
         {
             fightListBuilder();
@@ -658,7 +758,7 @@ function links()
     getFights($displayFightList);
 ?>
 
-<!-- <nav class="links"> -->
+
             <ul>
                 <li>
                     <img src="images/home.png" alt="home_icon">
@@ -685,7 +785,7 @@ function links()
                 </li>
                 <li>
                     <img src="images/mh.png" alt="home_icon">
-                    <a href="histoire.php">Mode Histoire</a>  
+                    <a href="story.php">Mode Histoire</a>  
                 </li>
                 
                 <li>
@@ -698,7 +798,7 @@ function links()
                 </li>
         
             </ul>
-        <!-- </nav> -->
+
 
         <?php
 }

@@ -2,6 +2,25 @@
     box-sizing: border-box;
 }
 
+body
+{
+
+background-color: #C9F0F2;
+
+}
+
+footer
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;   
+     
+    margin-left: 15%;
+    margin-right: 15%;
+    width: 70%;
+    margin-top: 10px;
+}
+
 a
 {
     color: black;
@@ -28,125 +47,181 @@ ul
     list-style:none;
 }
 
-
-
-
-            /* ##### LINKS ##### */
-
-.links
+.pageBuilder
 {
+    height: auto;
+    border: 1px solid black;
+    margin-left: 15%;
+    margin-right: 15%;
+    width: 70%;
+
+}
+
+.news
+{
+    height: 620px;
+    margin-left: 15%;
+    margin-right: 15%;
+    width: 70%;
+
+}
+
+.PageBuilderStorySpeak, .pageBuilderStoryFight
+{
+    height: 620px;
+    margin-left: 15%;
+    margin-right: 15%;
+    width: 70%;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+}
+
+.storyDialogue
+{
+    width: 800px;
+    justify-content:space-around;
+    flex-wrap: wrap;
+}
+
+
+
+.PageBuilderStorySpeak a
+{
+    background-color: red;
+    border-radius: 10px;
+    width: 150px;
+    display: flex;
+    justify-content:space-around;
+    text-align: center;
+    align-items: center;
+}
+
+
+/* ##### LINKS ##### */
+.links ul
+{ 
+    display:flex;
+    justify-content:space-around;
+    text-align: center;
+    align-items: center;
     background-color: #55aaad;
-    width:200px;
     border-radius: 20px;
     padding:3px;
-    /* position: fixed;
-    bottom: 0;
-    left:43%;
-    margin-left: 20px;
-    margin-bottom: 20px; */
-    
+    margin-left: 15%;
+    margin-right: 15%;
+    width: 70%;
+    border: 0 10px;
 }
 
 .links ul li
 {
-    display: flex;
-    justify-content: center;
-    align-items:center;
-    margin-bottom:10px;
-    margin-left:-30px;
-    
-
+    border: 0 10px;
 }
 
-.links ul li a
-{
-    margin: 0 5px;
-    padding: 5px;
-    border-radius: 10px;
-    background-color: #abdbdd;
-    color: rgb(0, 0, 0);
+.links ul li img
+{  
+    width: 16px;
 }
 
-.links ul li a:hover
+.links ul li a span
 {
-    
+    background-color: rgb(238, 98, 98);
     border-radius: 10px;
-    background-color: #11585a;
-    color: white;
-    padding:5px;
+    padding: 1px;
+    border: 1px solid black;
+}
 
+.linksFightAmount
+{
+    width:0px;
+    visibility: hidden;
 }
 
 
 /* ##### PERSO STATS BUILDER ##### */
 
-/* .statsPower, .statsNinjutsu, .statsTaijutsu, .statsGenjutsu, .statsLife
+.persoBuilder
 {
-
-    display: flex;
-    margin-top:10px;
-    text-align: left;
-    flex-direction: column;
-
-} */
-
-.persoBuilderSlide
-{
-    width: 220px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    
+    width: 250px; /* ####### */
+    height: 200px;
+    display: flex; 
     border-radius: 20px;
     background-color:rgb(245, 237, 169);
     border: 2px solid rgb(97, 28, 28);
-    padding: 5px;
-    /* position: fixed;
-    bottom: 0;
-    left:0; */
-    margin-bottom: 5px;
+    padding: 5px;    
     flex-direction: column;
+    padding: 5px;
+    margin: 0 15%;
+    margin-inline: 0;
+    margin-bottom: 20px;
+    margin-right: 50px;
 }
 
-.persoBuilderSlideNamePerso
+
+
+
+.persoBuilderGlobalSlide li
+{
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 4%;
+
+}
+
+
+
+.persoBuilderName
 {
     border: 2px solid black;
     border-radius: 10px;
     padding: 5px;
-    background-color:rgb(244, 247, 203); 
-}
-
-
-.persoBuilderGlobalSlide > li
-{
-    display:flex;
-    justify-content:center;
-}
-
-.persoBuilderSlideStatsPerso
-{
-    
-    display: flex;
-    align-items: center;
     text-align: center;
-    padding: 2px;
+    background-color:rgb(244, 247, 203);
+    margin: 0 10%;
 }
 
-.persoBuilderSlideStatsPersoStatValue
+.persoBuilderStats
+{
+    display: flex;
+    padding: 3px;
+    margin-top: 5px;
+}
+
+.persoBuilderMain
 {
 
-    background-color:rgb(194, 236, 227);
-    padding: 2px;
+    display: flex;
+    justify-content:space-around;
+}
+
+
+
+.persoBuilderMain > .persoBuilderMainStat
+{
+
+    width: 120px;
     border-radius: 10px;
-    display: flex;
 }
 
-.persoBuilderSlideStatsPersoStatName
+.persoAvatar
 {
-    margin-right:100px;
-    display: flex;
-    align-items: center;
-    text-align: center;
+    width: 100px;
+    height: 150px;
+    border: 1px solid black;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 5px;
+    
+}
+
+.persoBuilderStatsValue
+{
+    margin-left: 5px;
+    border-radius: 10px;
 }
 
 /* ##### SUBRSCRIBE ##### */
@@ -184,17 +259,13 @@ ul
     align-items: center;
     text-align: center;
     justify-content: center;
-
-
-
     border: 0px solid black;
 }
 
 .fightBuilderSlide > div > p
 {
     margin: 0 0px;
-    border: 1px solid black;
-    
+    border: 1px solid black;  
 }
 
 .fightContent > div 
@@ -204,21 +275,12 @@ ul
     text-align: center;
     justify-content:center;
     border: 0px solid black;
-    margin-top: 5px;
-
-    
+    margin-top: 5px;  
 }
 
-.fightContentSlideLogin, .fightBuilderSlideLogin
+.fightContentSlideLogin, .fightBuilderSlideLogin, .fightContentSlideName, .fightBuilderSlideName
 {
     width: 150px;
-
-}
-
-.fightContentSlideName, .fightBuilderSlideName
-{
-    width: 150px;
-
 }
 
 .fightContentSlidePower, .fightBuilderSlidePower
@@ -261,167 +323,3 @@ ul
     position: fixed;
     bottom: 0;
 }
-
-
-.menu
-{
-    display: flex;
-    justify-content: space-between;
-    
-    flex-wrap: wrap;
-    
-}
-
-.menu > .links
-{
-    display: flex;
-    align-items: center;
-    text-align: center;
-    justify-content:center;
-    margin-left: 400px;
-}
-
-
-.menu > .persoBuilderGlobalSlideDetail
-{
-    display: flex;
-    flex-wrap: wrap;
-    
-    background-color: aliceblue;
-    align-content: flex-start;
-    
-
-}
-
-.menu
-{
-    background-color: bisque;
-}
-
-
-
-.links2 ul
-{
-    
-    display:flex;
-    justify-content:space-around;
-    list-style:none;
-    text-align: center;
-    align-items: center;
-    background-color: #55aaad;
-    border-radius: 20px;
-    padding:3px;
-    margin-left: 20%;
-    margin-right: 20%;
-    width: 60%;
-    border: 0 10px;
-    
-
-}
-
-.links2 ul li
-{
-    border: 0 10px;
-}
-
-.links2 ul li img
-{
-    
-    width: 16px;
-    
-   
-}
-
-.links2 ul li a span
-{
-    background-color: rgb(238, 98, 98);
-    border-radius: 10px;
-    padding: 2px;
-}
-
-
-
-
-
-body
-{
-
-background-color: #C9F0F2;
-
-}
-
-footer
-{
-    position: absolute;
-    bottom: 0;
-    left: 40%;
-}
-
-
-
-.persoBuilder
-{
-    width: 280px;
-    height: 200px;
-    display: flex; 
-    border-radius: 20px;
-    background-color:rgb(245, 237, 169);
-    border: 2px solid rgb(97, 28, 28);
-    padding: 5px;
-
-    
-    flex-direction: column;
-    padding: 5px;
-    margin: 0 15%;
-    margin-inline: 0;
-    margin-bottom: 5px;
-}
-
-.persoBuilderName
-{
-    border: 2px solid black;
-    border-radius: 10px;
-    padding: 5px;
-    text-align: center;
-    background-color:rgb(244, 247, 203);
-    margin: 0 10%;
-}
-
-.persoBuilderStats
-{
-    display: flex;
-    padding: 3px;
-
-    margin-top: 5px;
-
-    
-}
-
-
-.persoBuilderStatsValue
-{
-
-    margin-left: 5px;
-    border-radius: 10px;
-
-}
-
-.linksFightAmount
-{
-    width:0px;
-    visibility: hidden;
-}
-
-.persoAvatar
-{
-    position: absolute;
-    top: 20%;
-    left: 60%;
-    width: 100px;
-    height: auto;
-    border: 1px solid black;
-    border-radius: 10px;
-    overflow: hidden;
-    
-}
-

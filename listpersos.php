@@ -41,7 +41,8 @@ getUserData();
 
       <?php
       $dataPerso = $perso;
-      persoBuilderCurrentPerso($dataPerso);
+      $persoBuilderDisplayValue = "link";
+      persoBuilder($dataPerso, $persoBuilderDisplayValue);
       ?>
  
      

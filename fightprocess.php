@@ -31,7 +31,8 @@ $dataAdversary = $req->fetch();
     <div class="fightIntroBoxWinner">
         <?php
         $dataPerso = $dataFighter;
-        persoBuilderOther($dataPerso);
+        $persoBuilderDisplayValue = "NoLink";
+        persoBuilder($dataPerso, $persoBuilderDisplayValue);
         ?>
     
     </div>
@@ -43,7 +44,8 @@ $dataAdversary = $req->fetch();
     <div class="fightIntroBoxLooser">
         <?php
         $dataPerso = $dataAdversary;
-        persoBuilderOther($dataPerso);
+        $persoBuilderDisplayValue = "NoLink";
+        persoBuilder($dataPerso, $persoBuilderDisplayValue);
         ?>
     
     </div>
