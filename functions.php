@@ -380,7 +380,7 @@ function increase_stats()
 
 function checkMhStep()
 {
-    global $pdo, $login, $globalDataStory, $totalMHStep;
+    global $pdo, $login, $globalDataStory, $globalDataUser, $globalDataPerso, $totalMHStep;
     getUserData();
     ##SECURITÉ
     $req = "SELECT COUNT(*) AS total FROM mh_steps";
@@ -403,7 +403,7 @@ function checkMhStep()
     ##SECURITÉ
 
 
-    if ($globalDataStory['mh_perso'] !== $globalDataStory['selected_perso'])
+    if ($globalDataStory['mh_perso'] !== $globalDataUser['selected_perso'])
 {
     echo 'Vous devez utiliser <a href="perso.php?perso=' . $globalDataStory['mh_perso'] . '">' . $globalDataStory['mh_perso'] . '</a> pour cette étape.'; 
     die;
@@ -414,22 +414,49 @@ function checkMhStep()
 function levelPerso($xp) 
 {
     $level = 1;
-    $xpRequired = 50;
+    $xpRequired = 200;
 
     while ($xp >= $xpRequired) {
         $xp -= $xpRequired; 
         $level++; 
         $xpRequired = 200 + (160 * ($level - 1)) + (5 * pow(($level - 1), 2));
 
-    }
+    } 
     return $level;
 }
+
+function calcXPLevel($xp) 
+{
+    global $pdo, $globalDataPerso, $xp;
+    getUserData();
+    $level = 1;
+    $xpRequired = 200;
+
+    while ($xp >= $xpRequired) {
+        
+
+        $xp -= $xpRequired; 
+        $level++; 
+        $xpRequired = 200 + (160 * ($level - 1)) + (5 * pow(($level - 1), 2));
+    }
+
+    return [
+        'level' => $level,
+        'xpActuel' => $xp,         // XP restant après le dernier niveau
+        'xpRequis' => $xpRequired,  // XP nécessaire pour atteindre le prochain niveau
+
+    ];
+}
+
+
+
 
 function fightProcess($fightResult)
 {
     global $pdo, $fightResult, $dataFighter, $dataAdversary;
     bdd_connexion();
-    
+
+        
     $fighterWin = 0;
     $fighterLose = 0;
     $fighterDraw = 0;
@@ -442,20 +469,9 @@ function fightProcess($fightResult)
     $adversaryKills = 0;
     $adversaryDeaths = 0;
 
-    $dataFighterWin = $dataFighter['win'];
-    $dataFighterLose = $dataFighter['lose'];
-    $dataFighterDraw = $dataFighter['draw'];
-    $dataFighterKills = $dataFighter['kills'];
-    $dataFighterDeaths = $dataFighter['deaths'];
-    $dataFighterXP = $dataFighter['xp_perso'];
-
-    $dataAdversaryWin = $dataAdversary['win'];
-    $dataAdversaryLose = $dataAdversary['lose'];
-    $dataAdversaryDraw = $dataAdversary['draw'];
-    $dataAdversaryKills = $dataAdversary['kills'];
-    $dataAdversaryDeaths = $dataAdversary['deaths'];
-    $dataAdversaryXP = $dataAdversary['xp_perso'];
-
+    $xpFighter = 0;
+    $xpAdversary = 0;
+    
 
     switch ($fightResult)
     {
@@ -520,36 +536,39 @@ function fightProcess($fightResult)
     
     }
 
-    $xpFighter = $dataFighterXP + $xpFighter;
-    $fighterWin = $dataFighterWin + $fighterWin;
-    $fighterLose = $dataFighterLose + $fighterLose;
-    $fighterDraw = $dataFighterDraw + $fighterDraw;
-    $fighterKills = $dataFighterKills + $fighterKills;
-    $fighterDeaths = $dataFighterDeaths + $fighterDeaths;
+    $req = $pdo->prepare("
+    UPDATE persos SET xp_perso = ?, win = ?, lose = ?, draw = ?, kills = ?, deaths = ? WHERE id_perso = ?
+    ");
 
-    $xpAdversary = $dataAdversaryXP + $xpAdversary;
-    $adversaryWin = $dataAdversaryWin + $adversaryWin;
-    $adversaryLose = $dataAdversaryLose + $adversaryLose;
-    $adversaryDraw = $dataAdversaryDraw + $adversaryDraw;
-    $adversaryKills = $dataAdversaryKills + $adversaryKills;
-    $adversaryDeaths = $dataAdversaryDeaths + $adversaryDeaths;
+    $req->execute([
+        $dataFighter['xp_perso'] + $xpFighter,     
+        $dataFighter['win'] + $fighterWin,         
+        $dataFighter['lose'] + $fighterLose,       
+        $dataFighter['draw'] + $fighterDraw,       
+        $dataFighter['kills'] + $fighterKills,     
+        $dataFighter['deaths'] + $fighterDeaths,   
+        $dataFighter['id_perso']                   
+    ]);
 
-    $req = $pdo->prepare("UPDATE persos SET xp_perso = ?, win = ?, lose = ?, draw = ?, kills = ?, deaths = ? WHERE id_perso = ?");
-    $req->execute([$xpFighter, $fighterWin, $fighterLose, $fighterDraw, $fighterKills, $fighterDeaths, $dataFighter['id_perso']]); 
-    $req->execute([$xpAdversary, $adversaryWin, $adversaryLose, $adversaryDraw, $adversaryKills, $adversaryDeaths, $dataAdversary['id_perso']]);
+    $req->execute([
+        $dataAdversary['xp_perso'] + $xpAdversary,     
+        $dataAdversary['win'] + $adversaryWin,         
+        $dataAdversary['lose'] + $adversaryLose,       
+        $dataAdversary['draw'] + $adversaryDraw,       
+        $dataAdversary['kills'] + $adversaryKills,     
+        $dataAdversary['deaths'] + $adversaryDeaths,   
+        $dataAdversary['id_perso']                    
+    ]);
 
     $req = $pdo->prepare('
     INSERT INTO combat (fighter_id, adversary_id) 
     VALUES (:fighter_id, :adversary_id)
     ');
-
     $req->execute([
     ':fighter_id'   => $dataFighter['id_perso'], 
     ':adversary_id' => $dataAdversary['id_perso']
     ]);
-
 }
-
 
 function fightList()
 {
@@ -663,7 +682,7 @@ function fightListBuilder()
 
 function getFights($displayFightList)
 {
-    global $fightCount, $pdo, $login, $globalDataUser, $globalDataPerso, $fighter, $skip, $skipLevel, $levelPerso, $levelFighter, $fightList, $req, $dataCombat, $xp, $idPerso;
+    global $fightCount, $pdo, $login, $globalDataUser, $globalDataPerso , $fighter, $skip, $skipLevel, $levelPerso, $levelFighter, $fightList, $req, $dataCombat, $xp, $idPerso;
     getUserData();
     $req = 'SELECT * FROM persos ORDER BY xp_perso DESC';
     $req = $pdo->prepare($req);
