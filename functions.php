@@ -159,8 +159,6 @@ function new_perso()
 }
 
 
-
-
 function updatePower($globalDataPerso)
 {
     global $pdo, $globalDataPerso;
@@ -674,7 +672,7 @@ function getFights($displayFightList)
 
     $req = 'SELECT * FROM combat WHERE fighter_id = ?';
     $req = $pdo->prepare($req);
-    $req->execute([$globalDataUser['id_perso']]);
+    $req->execute([$globalDataPerso['id_perso']]);
     $dataCombat = $req->fetchAll();
 
     if ($displayFightList == true)
@@ -685,7 +683,7 @@ function getFights($displayFightList)
     
     $xp = $globalDataPerso['xp_perso'];
     $levelPerso = levelPerso($xp);
-    echo $globalDataPerso['xp_perso'];
+
 
     
 
