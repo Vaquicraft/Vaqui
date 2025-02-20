@@ -45,7 +45,8 @@ echo  '<h2>Gestion des personnages de ' . $login . '</h2>';
     <?php
     $dataPerso = $perso;
     $persoBuilderDisplayValue = "link";
-    persoBuilder($dataPerso, $persoBuilderDisplayValue);
+    $persoBuilderTarget = "player";
+    persoBuilderGlobal($dataPerso, $persoBuilderDisplayValue, $persoBuilderTarget);
     ?>
 
    

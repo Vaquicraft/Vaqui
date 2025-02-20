@@ -4,6 +4,11 @@ require 'functions.php';
 getUserData();
 menu();
 
+?>
+
+<div class="pageBuilder">
+    <?php
+
 if (!isset($_GET['id'])) 
 {
     header("fight.php");
@@ -31,21 +36,21 @@ $dataAdversary = $req->fetch();
     <div class="fightIntroBoxWinner">
         <?php
         $dataPerso = $dataFighter;
-        $persoBuilderDisplayValue = "NoLink";
-        persoBuilder($dataPerso, $persoBuilderDisplayValue);
+        $persoBuilderDisplayValue = "noLink";
+        $persoBuilderTarget = "player";   
+        persoBuilderGlobal($dataPerso, $persoBuilderDisplayValue, $persoBuilderTarget);
         ?>
     
     </div>
-    <div class="returnButtonFight">
-        <a href="fight.php">Retour à la liste des combats</a>
-    </div>
+    
     
     
     <div class="fightIntroBoxLooser">
         <?php
         $dataPerso = $dataAdversary;
-        $persoBuilderDisplayValue = "NoLink";
-        persoBuilder($dataPerso, $persoBuilderDisplayValue);
+        $persoBuilderDisplayValue = "noLink";
+        $persoBuilderTarget = "player";   
+        persoBuilderGlobal($dataPerso, $persoBuilderDisplayValue, $persoBuilderTarget);
         ?>
     
     </div>
@@ -55,80 +60,91 @@ $dataAdversary = $req->fetch();
     <?php
     
     echo '<h2>Résultat du Combat</h2>';
-    echo '<p>' .$dataFighter['owner_perso'] . ' (' . $dataFighter['name_perso'] . ') attaque avec une puissance de ' . $dataFighter['power_perso'] . '</p>';
-    echo '<p>' .$dataAdversary['owner_perso'] . ' (' . $dataAdversary['name_perso'] . ') défend avec une puissance de ' . $dataAdversary['power_perso'] . '</p>';
 
-    if ($dataFighter['power_perso'] > $dataAdversary['life_perso'] && $dataAdversary['power_perso'] > $dataFighter['life_perso'] )
+    $xp = $dataFighter['xp_perso'];
+    $xp = calcXPLevel($xp);
+    $level = $dataXP['level'];
+
+    $ninFighter = $dataFighter['nin_perso'] * rand(50,150) / 100 ;
+    $taiFighter = $dataFighter['tai_perso'] * rand(50,150) / 100 ;
+    $genFighter = $dataFighter['gen_perso'] * rand(50,150) / 100 ;
+    $lifeFighter = $dataFighter['life_perso'];
+
+    $ninAdversary = $dataAdversary['nin_perso'] * rand(50,150) / 100 ;
+    $taiAdversary = $dataAdversary['tai_perso'] * rand(50,150) / 100 ;
+    $genAdversary = $dataAdversary['gen_perso'] * rand(50,150) / 100 ;
+    $lifeAdversary = $dataAdversary['life_perso'];
+
+    $damageFighter = ($ninFighter + $taiFighter + $genFighter) * 3;
+    $damageAdversary = ($ninAdversary + $taiAdversary + $genAdversary) * 3;
+
+    $ninBattle = $ninFighter - $ninAdversary;
+    $taiBattle = $taiFighter - $taiAdversary;
+    $genBattle = $genFighter - $genAdversary;
+
+    $ninDef = $ninBattle - $genBattle;
+    $taiDef = $taiBattle - $ninBattle;
+    $genDef = $genBattle - $taiBattle;
+
+    $ninDamage = $ninBattle - $ninDef;
+    $taiDamage = $taiBattle - $taiDef;
+    $genDamage = $genBattle - $genDef;
+
+    $fightDamage = ($ninDamage + $taiDamage + $genDamage) * 3;
+
+    echo 'Puissance d\'attaque (Joueur) : ' . $damageFighter . '<br />';
+    echo 'Puissance d\'attaque (Adversaire) : ' . $damageAdversary . '<br /><br />';
+    echo 'Dommage infligés : ' . abs($fightDamage) . '<br />'; 
+    
+    
+    if ($damageFighter > $lifeAdversary) 
     {
-        echo '<p>Les deux adversaires se sont entretués.</p>';
+        $fightResult = "adversaryKilled";
+    }
+     elseif ($damageAdversary > $lifeFighter) 
+    {
+        $fightResult = "fighterKilled";
+    }
+     elseif ($damageFighter > $lifeAdversary && $damageAdversary > $lifeFighter) 
+    {
         $fightResult = "doubleKill";
-        fightProcess($fightResult);
-        exit;
     }
-    
-    if ($dataFighter['power_perso'] > $dataAdversary['power_perso'] )
+     elseif ($fightDamage <= 2 && $fightDamage >= -2) 
     {
-        $damage = $dataFighter['power_perso'] - $dataAdversary['power_perso'];
-        echo '<p>' .$dataAdversary['owner_perso'] . ' (' . $dataAdversary['name_perso'] . ') encaisse ' . $damage . ' points de dégâts</p>';
-
-        if ($dataAdversary['life_perso'] <= $damage)
-        {
-            echo '<p>' . $dataAdversary['owner_perso'] . ' (' . $dataAdversary['name_perso'] . ') n\'a pas survécu au combat.</p>';
-            $fightResult = "adversaryKilled";
-            fightProcess($fightResult);
-            exit;
-        }
-        else
-        {
-            echo '<p>' . $dataFighter['owner_perso'] . ' (' . $dataFighter['name_perso'] . ') a gagné le combat.</p>';
-            $fightResult = "fighterWin";
-            fightProcess($fightResult);
-            exit;
-        }
-    }
-
-    if ($dataFighter['power_perso'] == $dataAdversary['power_perso'] )
-    {
-        echo '<p>Les deux combattants se sont affrontés avec courage, mais aucun n\'a pu se démarquer. Match nul.</p>';
         $fightResult = "draw";
-        fightProcess($fightResult);
-        exit;
     }
-    
-    else
+     elseif ($fightDamage > 2) 
     {
-        {
-            $damage = $dataAdversary['power_perso'] - $dataFighter['power_perso'];
-            echo 'L\'attaquant encaisse ' . $damage . 'points de dégâts';
-
-            if ($dataFighter['life_perso'] <= $damage)
-        {
-            echo '<p>' . $dataFighter['owner_perso'] . ' (' . $dataFighter['name_perso'] . ') n\'a pas survécu au combat.</p>';
-            $fightResult = "fighterKilled";
-        fightProcess($fightResult);
-            exit; 
-        }
-        else
-        {
-            echo '<p>' . $dataAdversary['owner_perso'] . ' (' . $dataAdversary['name_perso'] . ') a gagné le combat.</p>';
-            $fightResult = "aversaryWin";
-        fightProcess($fightResult);
-            exit;
-        }
-        }
+        $fightResult = "fighterWin";
     }
+     elseif ($fightDamage < -2) 
+    {
+        $fightResult = "adversaryWin";
+    }
+
+    fightProcess($fightResult);
+
+    
+
+    
+
+
     ?> 
     
     </div>
 
-
-<div class="fightIntroBox">
-    
-    <div class="fightIntroBoxWinner">
-    
+ 
+    <div class="returnButtonFight">
+        <a href="fight.php">Retour à la liste des combats</a>
     </div>
+  
 
-    <div class="fightIntroBoxLooser">
-    
-    </div>
+
+
 </div>
+
+<?php
+footer();
+?>
+
+

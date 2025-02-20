@@ -58,7 +58,6 @@ function check_session()
     }
 }
 
-
 function getUserData()
 {
     global $login, $pdo, $globalDataUser, $globalDataStory, $globalDataPerso;
@@ -108,7 +107,7 @@ function menu()
 
 function footer()
 {
-    global $pdo, $dataPerso, $persoBuilderDisplayValue, $login, $globalDataUser;
+    global $pdo, $dataPerso, $persoBuilderDisplayValue, $login, $globalDataUser, $persoBuilderTarget;
     getUserData();
     ?>
     <footer>
@@ -117,12 +116,13 @@ function footer()
         $req->execute([$login, $globalDataUser['selected_perso']]);
         $dataPerso=$req->fetch();
         $persoBuilderDisplayValue = "noLink";
-        persoBuilder($dataPerso, $persoBuilderDisplayValue);
+        $persoBuilderTarget = "player";   
+        persoBuilderGlobal($dataPerso, $persoBuilderDisplayValue, $persoBuilderTarget);
+        
         ?>
     </footer>
     <?php
 }
-
 
 function new_perso()
 {
@@ -141,9 +141,9 @@ function new_perso()
         'name_perso' => $globalDataStory['mh_reward_1'],
         'power_perso' => 10,
         'xp_perso' => 0,
-        'nin_perso' => 0,
-        'tai_perso' => 0,
-        'gen_perso' => 0,
+        'nin_perso' => 1,
+        'tai_perso' => 1,
+        'gen_perso' => 1,
         'life_perso' => 100,
         'avatar_perso' => 1,
         'win' => 0,
@@ -157,7 +157,6 @@ function new_perso()
         'training_life' => 0
     ]);
 }
-
 
 function updatePower($globalDataPerso)
 {
@@ -173,192 +172,140 @@ function updatePower($globalDataPerso)
     $req->execute([$power, $globalDataPerso['id_perso']]);
 }
 
-function xpCalc($xp) 
+function calcXPLevel($xp)
 {
-    global $level, $xp;
-    $level = levelPerso($xp);
-    if ($level <= 0) {
-        return 0; 
+    global $pdo, $globalDataPerso;
+    getUserData();
+    
+    $level = 1;
+    $xpRequired = 200;
+    $currentXP = 0;
+    $totalXpRequired = $xpRequired;
+    
+    while ($xp >= $totalXpRequired) {
+        $level++;
+        $xpRequired = 200 + (160 * ($level - 1)) + (5 * pow(($level - 1), 2));
+        $totalXpRequired += $xpRequired;
     }
     
-    return pow(1, ($level - 1)) + (1 * (log($level) * 1.75) + 19 );
+    return [
+        'level' => $level,
+        'xpActuel' => $xp - ($totalXpRequired - $xpRequired),
+        'xpRequis' => $xpRequired,
+        'baseXP' => pow(1, ($level - 1)) + (1 * (log($level) * 1.75) + 19 ),
+    ];
 }
 
 
-
-function persoBuilder($dataPerso, $persoBuilderDisplayValue)
+function persoBuilderGlobal($dataPerso, $persoBuilderDisplayValue, $persoBuilderTarget)
 {
-    global $pdo, $login, $persos, $perso, $name_perso, $globalDataUser, $dataPerso, $idPerso, $persoBuilderDisplayValue, $avatar;
+    global $pdo, $login, $globalDataStory, $globalDataUser, $dataPerso, $persoBuilderDisplayValue, $avatar, $persoBuilderTarget;
     getUserData();
-    updatePower($dataPerso)
+
+    updatePower($dataPerso);
+    $avatar = $dataPerso['name_perso'] . $dataPerso['avatar_perso'];
+
+
+    if ($persoBuilderTarget == "player")
+    {
+        $xp = $dataPerso['xp_perso'];
+        $dataXP = calcXPLevel($xp);
+        $displayRemainingXPPercentage = round(($dataXP['xpActuel'] / $dataXP['xpRequis']) * 100,2);
+        $dataBuilderName = $dataPerso['name_perso'];
+        $dataBuilderPower = $dataPerso['power_perso'];
+        $stats = 
+        [
+            "Niveau" => $dataXP['level'] . ' (' .$displayRemainingXPPercentage . '%)' ,
+            "Ninjutsu"  => $dataPerso['nin_perso'],
+            "Taijutsu"  => $dataPerso['tai_perso'],
+            "Genjutsu"  => $dataPerso['gen_perso'],
+            "Vie"  => $dataPerso['life_perso'],
+        ];
+    }
+
+    if ($persoBuilderTarget == "fight")
+    {
+        $xp = $dataPerso['xp_perso'];
+        $dataXP = calcXPLevel($xp);
+        $dataBuilderName = $dataPerso['name_perso'];
+        $dataBuilderPower = $dataPerso['power_perso'];
+        $stats = 
+        [
+            "Niveau" => $dataXP['level'],
+            "Vie"  => $dataPerso['life_perso'],
+        ];
+    }
+
+    if ($persoBuilderTarget == "story")
+    {
+        $dataBuilderName = $globalDataStory['mh_enemy'];
+        $dataBuilderPower = $globalDataStory['mh_power'];
+        $avatar = $globalDataStory['mh_enemy'] . '1';
+        $statValue = "?";
+        $stats =  [];
+    }
+
+    
+
     ?>
     <div class="persoBuilder">
         <div class="persoBuilderName">
-        
+            
             <?php
+            if ($persoBuilderDisplayValue == "noLink")
+            {
+                echo $dataBuilderName . ' (' . $dataBuilderPower . ')';
+            }
             if ($persoBuilderDisplayValue == "link")
             {
-                ?> 
+                ?>
                 <a href="perso.php?perso=<?= $dataPerso['name_perso']; ?>">
-                    <?= $dataPerso['name_perso']; ?>
+                    <?= $dataPerso['name_perso'] . ' (' . $dataPerso['power_perso'] . ')'; ?>
                 </a>
                 <?php
             }
-            else
-            {
-                echo $dataPerso['name_perso'];
-            }
-            echo ' (' . $dataPerso['power_perso'] . ')';
+            
             ?>
-
         </div>
 
         <div class="persoBuilderMain">
             <div class="persoBuilderMainStat">
                 <?php
-                persoBuilderGetStats();
+
+
+        
+                foreach ($stats as $statName => $statValue)
+                {
+                    ?>
+                    <div class="persoBuilderStats">
+                        <div class="persoBuilderStatsName">
+                            <?php
+                            echo $statName;
+                            ?>
+                        </div>
+
+                        <div class="persoBuilderStatsValue">
+                            <?php
+                            echo ' : ' . $statValue;
+                            
+                            ?>
+                        </div>
+                    </div>
+                <?php
+                }
+
                 ?>
             </div>
 
             <div class ="persoBuilderMainAvatar">
-                <?php
-                $selectedPerso = $dataPerso['name_perso'];
-                $selectedAvatar = $dataPerso['avatar_perso'];
-                $avatar = $selectedPerso . $selectedAvatar;
-                displayAvatar();
-                ?>
-            </div>
-
-
-            
+                <img class="persoAvatar" src="images/avatars/<?= $avatar ?>.jpeg" alt"">
+            </div>     
         </div>
     </div>
     <?php
     
 }
 
-function persoBuilderStory()
-{
-    global $pdo, $login, $globalDataStory, $globalDataUser, $dataPerso, $persoBuilderDisplayValue, $avatar;
-    getUserData();
-    $dataPerso = $globalDataUser;
-    updatePower($dataPerso)
-    ?>
-    <div class="persoBuilder">
-        <div class="persoBuilderName">
-        
-            <?php
-           
-            echo $globalDataStory['mh_enemy'];
-           
-            echo ' (' . $globalDataStory['mh_power'] . ')';
-            ?>
-
-        </div>
-
-        <div class="persoBuilderMain">
-            <div class="persoBuilderMainStat">
-                <?php
-                
-    $statValue = "?";
-    $stats = 
-    [
-        "Niveau" => $statValue,
-        "XP" => $statValue,
-        "Ninjutsu"  => $statValue,
-        "Taijutsu"  => $statValue,
-        "Genjutsu"  => $statValue,
-    ];
-
-        
-    foreach ($stats as $statName => $statValue)
-    {
-        ?>
-        <div class="persoBuilderStats">
-            <div class="persoBuilderStatsName">
-                <?php
-                echo $statName;
-                ?>
-            </div>
-
-            <div class="persoBuilderStatsValue">
-                <?php
-                echo ' : ' . $statValue;
-                  
-                ?>
-            </div>
-        </div>
-    <?php
-    }
-
-                ?>
-            </div>
-
-            <div class ="persoBuilderMainAvatar">
-                <?php
-                $selectedPerso = $dataPerso['name_perso'];
-                $selectedAvatar = $dataPerso['avatar_perso'];
-                $avatar = $globalDataStory['mh_enemy'] . '1';
-                displayAvatar();
-                ?>
-            </div>
-
-
-            
-        </div>
-    </div>
-    <?php
-    
-}
-
-function displayAvatar()
-{
-    global $dataPerso, $globalDataUser, $pdo, $avatar;
-    getUserData();
-    ?>
-    <img class="persoAvatar" src="images/avatars/<?= $avatar ?>.jpeg" alt"">
-    <?php
-}
-
-
-
-function persoBuilderGetStats()
-{
-    global $pdo, $dataPerso, $statName, $statValue, $stats, $xp, $level;
-    getUserData();
-
-    $xp = $dataPerso['xp_perso'];
-    $stats = 
-    [
-        "Niveau" => levelPerso($xp),
-        "XP" => $dataPerso['xp_perso'],
-        "Ninjutsu"  => $dataPerso['nin_perso'],
-        "Taijutsu"  => $dataPerso['tai_perso'],
-        "Genjutsu"  => $dataPerso['gen_perso'],
-    ];
-
-        
-    foreach ($stats as $statName => $statValue)
-    {
-        ?>
-        <div class="persoBuilderStats">
-            <div class="persoBuilderStatsName">
-                <?php
-                echo $statName;
-                ?>
-            </div>
-
-            <div class="persoBuilderStatsValue">
-                <?php
-                echo ' : ' . $statValue;
-                  
-                ?>
-            </div>
-        </div>
-    <?php
-    }
-
-}
 
 function increase_stats()
 {
@@ -411,49 +358,9 @@ function checkMhStep()
 
 }
 
-function levelPerso($xp) 
-{
-    $level = 1;
-    $xpRequired = 200;
-
-    while ($xp >= $xpRequired) {
-        $xp -= $xpRequired; 
-        $level++; 
-        $xpRequired = 200 + (160 * ($level - 1)) + (5 * pow(($level - 1), 2));
-
-    } 
-    return $level;
-}
-
-function calcXPLevel($xp) 
-{
-    global $pdo, $globalDataPerso, $xp;
-    getUserData();
-    $level = 1;
-    $xpRequired = 200;
-
-    while ($xp >= $xpRequired) {
-        
-
-        $xp -= $xpRequired; 
-        $level++; 
-        $xpRequired = 200 + (160 * ($level - 1)) + (5 * pow(($level - 1), 2));
-    }
-
-    return [
-        'level' => $level,
-        'xpActuel' => $xp,         // XP restant après le dernier niveau
-        'xpRequis' => $xpRequired,  // XP nécessaire pour atteindre le prochain niveau
-
-    ];
-}
-
-
-
-
 function fightProcess($fightResult)
 {
-    global $pdo, $fightResult, $dataFighter, $dataAdversary;
+    global $pdo, $fightResult, $dataFighter, $dataAdversary, $dataXP;
     bdd_connexion();
 
         
@@ -462,12 +369,18 @@ function fightProcess($fightResult)
     $fighterDraw = 0;
     $fighterKills = 0;
     $fighterDeaths = 0;
+    $xp = $dataFighter['xp_perso'];
+    $fighterBaseXP = calcXPLevel($xp);
+    $fighterBaseXP = $dataXP['baseXP'];
 
     $adversaryWin = 0;
     $adversaryLose = 0;
     $adversaryDraw = 0;
     $adversaryKills = 0;
     $adversaryDeaths = 0;
+    $xp = $dataAdversary['xp_perso'];
+    $aversaryBaseXP = calcXPLevel($xp);
+    $aversaryBaseXP = $dataXP['baseXP'];
 
     $xpFighter = 0;
     $xpAdversary = 0;
@@ -476,72 +389,64 @@ function fightProcess($fightResult)
     switch ($fightResult)
     {
         case "fighterWin":
-            $xp = $dataFighter['xp_perso'];
-            $xpFighter = xpCalc($xp);
-            $xp = $dataAdversary['xp_perso'];
-            $xpAdversary = xpCalc($xp) * 0.25;
+            $xpFighter = $fighterBaseXP;
+            $xpAdversary = $aversaryBaseXP * 0.25;
             $fighterWin = 1;
             $adversaryLose = 1;
-      
             break;
+
         case "adversaryWin":
-            $xp = $dataFighter['xp_perso'];
-            $xpFighter = xpCalc($xp) * 0.25;
-            $xp = $dataAdversary['xp_perso'];
-            $xpAdversary = xpCalc($xp);
+            $xpFighter = $fighterBaseXP * 0.25;
+            $xpAdversary = $aversaryBaseXP;
             $adversaryWin = 1;
             $fighterLose = 1;
             break;
+
         case "doubleKill":
-            $xp = $dataFighter['xp_perso'];
-            $xpFighter = xpCalc($xp) * 0.25;
-            $xp = $dataAdversary['xp_perso'];
-            $xpAdversary = xpCalc($xp) * 0.25;
+            $xpAdversary = $aversaryBaseXP * 0.25;
+            $xpFighter = $fighterBaseXP * 0.25;
             $fighterLose = 1;
             $fighterKills = 1;
             $fighterDeaths = 1;
             $adversaryLose = 1;
             $adversaryKills = 1;
-            $adversaryDeaths = 1;
-            
+            $adversaryDeaths = 1; 
             break;
+
         case "fighterKilled":
-            $xp = $dataFighter['xp_perso'];
-            $xpFighter = xpCalc($xp) * 0.2;
-            $xp = $dataAdversary['xp_perso'];
-            $xpAdversary = xpCalc($xp) * 1.15;
+            $xpFighter = $fighterBaseXP * 0.2;
+            $xpAdversary = $aversaryBaseXP * 1.15;
             $adversaryKills = 1;
             $adversaryWin = 1;
             $fighterLose = 1;
             $fighterDeaths = 1;
             break;
+
         case "adversaryKilled":
-            $xp = $dataFighter['xp_perso'];
-            $xpFighter = xpCalc($xp) * 1.15;
-            $xp = $dataAdversary['xp_perso'];
-            $xpAdversary = xpCalc($xp) * 0.2;
+            $xpFighter = $fighterBaseXP * 1.15;
+            $xpAdversary = $aversaryBaseXP * 0.2;
             $fighterWin = 1;
             $fighterKills = 1;
             $adversaryLose = 1;
             $adversaryDeaths = 1;
             break;
+
         case "draw":
-            $xp = $dataFighter['xp_perso'];
-            $xpFighter = xpCalc($xp) * 0.3;
-            $xp = $dataAdversary['xp_perso'];
-            $xpAdversary = xpCalc($xp) * 0.3;
+            $xpFighter = $fighterBaseXP * 0.3;
+            $xpAdversary = $aversaryBaseXP * 0.3;
             $fighterDraw = 1;
             $adversaryDraw = 1;
             break;
     
     }
+    echo 'Vous avez gagné ' . $xpFighter . ' xp';
 
     $req = $pdo->prepare("
     UPDATE persos SET xp_perso = ?, win = ?, lose = ?, draw = ?, kills = ?, deaths = ? WHERE id_perso = ?
     ");
 
     $req->execute([
-        $dataFighter['xp_perso'] + $xpFighter,     
+        $dataFighter['xp_perso'] + round($xpFighter,2),     
         $dataFighter['win'] + $fighterWin,         
         $dataFighter['lose'] + $fighterLose,       
         $dataFighter['draw'] + $fighterDraw,       
@@ -551,7 +456,7 @@ function fightProcess($fightResult)
     ]);
 
     $req->execute([
-        $dataAdversary['xp_perso'] + $xpAdversary,     
+        $dataAdversary['xp_perso'] + round($xpAdversary,2),     
         $dataAdversary['win'] + $adversaryWin,         
         $dataAdversary['lose'] + $adversaryLose,       
         $dataAdversary['draw'] + $adversaryDraw,       
@@ -616,63 +521,64 @@ function fightList()
 
 function fightListBuilder()
 {
-    global $pdo, $fighter, $xp, $fightList;
-
+    global $pdo, $adversary, $xp, $fightList, $adversaryLevel;
     ?>
     
     <div class="fightContent">
             <div class="fightContentSlideLogin">
                 <?php
-                echo $fighter['owner_perso'];
+                echo $adversary['owner_perso'];
                 ?>
             </div>
             
             <div class="fightContentSlideName">
             <?php
-                echo $fighter['name_perso'];
+                echo $adversary['name_perso'];
                 ?>
             </div>
 
             <div class="fightContentSlideLevel">
             <?php
-                $xp = $fighter['xp_perso'];
-                echo levelPerso($xp);
+                $xp = $adversary['xp_perso'];
+                $dataXP = calcXPLevel($xp);
+                $adversaryLevel = $dataXP['level'];
+                echo $adversaryLevel;
                 ?>
             </div>
 
             <div class="fightContentSlidePower">
             <?php
-                $idPerso = $fighter['id_perso'];
-                echo $fighter['power_perso']
+                $idPerso = $adversary['id_perso'];
+                echo $adversary['power_perso']
                 ?>
             </div>
 
             <div class="fightContentSlideWin">
             <?php
-                echo $fighter['win'];
+                echo $adversary['win'];
                 ?>
             </div>
 
             <div class="fightContentSlideLose">
             <?php
-                echo $fighter['lose'];
+                echo $adversary['lose'];
                 ?>
             </div>
 
             <div class="fightContentSlideKill">
             <?php
-                echo $fighter['kills'];
+                echo $adversary['kills'];
                 ?>
             </div>
 
             <div class="fightContentSlideDraw">
             <?php
-                echo $fighter['draw'];
+                echo $adversary['draw'];
                 ?>
             </div>
             <div class="fightContentSlideFightButton">
             <?php
-           echo '<a href="fightprocess.php?id=' . $fighter['id_perso'] . '"><img src="images/fight.png" alt=""></a>'; 
+           echo '<a href="fightprocess.php?id=' . $adversary['id_perso'] . '"><img src="images/fight.png" alt=""></a>'; 
             ?>
             
             </div>
@@ -682,7 +588,7 @@ function fightListBuilder()
 
 function getFights($displayFightList)
 {
-    global $fightCount, $pdo, $login, $globalDataUser, $globalDataPerso , $fighter, $skip, $skipLevel, $levelPerso, $levelFighter, $fightList, $req, $dataCombat, $xp, $idPerso;
+    global $fightCount, $pdo, $login, $globalDataUser, $globalDataPerso , $adversary, $skip, $skipLevel, $levelPerso, $levelFighter, $fightList, $req, $dataCombat, $xp, $dataXP, $idPerso, $adversaryLevel;
     getUserData();
     $req = 'SELECT * FROM persos ORDER BY xp_perso DESC';
     $req = $pdo->prepare($req);
@@ -697,32 +603,28 @@ function getFights($displayFightList)
     if ($displayFightList == true)
     {
         fightList();
-
     }
     
     $xp = $globalDataPerso['xp_perso'];
-    $levelPerso = levelPerso($xp);
-
-
-    
+    $dataXP = calcXPLevel($xp);
+    $levelPerso = $dataXP['level'];
 
     $fightCount = 0;
     
-    foreach ($fightList as $fighter)
+    foreach ($fightList as $adversary)
     {
 
-        if ($fighter['owner_perso'] == $login)
+        if ($adversary['owner_perso'] == $login)
         {
             continue;
         }
         $skip = false;
-        // $skipLevel = true;
+             
+        $xp = $adversary['xp_perso'];
+        $dataXP = calcXPLevel($xp);
+        $adversaryLevel = $dataXP['level'];
         
-        
-        $xp = $fighter['xp_perso'];
-        $levelFighter = levelPerso($xp);
-        
-        if ($levelPerso + 2 < $levelFighter || ($levelPerso - 2 > $levelFighter))
+        if ($levelPerso + 2 < $adversaryLevel || ($levelPerso - 2 > $adversaryLevel))
         {
             $skipLevel = true;
             
@@ -731,15 +633,12 @@ function getFights($displayFightList)
                 continue;
             }
         }
-        
-
-
-        
+    
         if(!empty($dataCombat))
         {
             foreach ($dataCombat as $value)
             {
-                if ($fighter['id_perso'] == $value['adversary_id'])
+                if ($adversary['id_perso'] == $value['adversary_id'])
                 {
                     $skip = true;
                     break;      
@@ -747,23 +646,24 @@ function getFights($displayFightList)
             }    
             if ($skip)
             {
-                continue;
-                
-        
-            }
-            
+                continue;    
+            }        
         }
         $fightCount++;
-        $idPerso = $fighter['id_perso'];
+        $idPerso = $adversary['id_perso'];
+        ?>
         
+        <div class="fightListContent">
+            <?php
         if ($displayFightList == true)
         {
             fightListBuilder();
-        }
+        }    
+        ?>
+        </div>
+        <?php
         
-
-    }
-    
+    }   
 
     return $fightCount;
 }
@@ -774,8 +674,6 @@ function links()
     $displayFightList = false;
     getFights($displayFightList);
 ?>
-
-
             <ul>
                 <li>
                     <img src="images/home.png" alt="home_icon">
@@ -819,5 +717,7 @@ function links()
 
         <?php
 }
+
+
 
 ?>
