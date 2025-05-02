@@ -1,0 +1,58 @@
+*
+{
+    background-color: #111;
+    color: white;
+}
+
+.headerMenu
+{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.headerMenu > li
+{
+    background-color: rgb(90, 221, 50);
+    padding: 10px;
+    border-radius: 10px;
+    list-style: none;
+    margin: 2rem;
+
+}
+
+.headerMenu > li > a
+{
+    background-color: inherit;
+    text-decoration: none;
+
+ 
+
+    font-weight: bold;
+}
+
+.connexionMainTitle
+{
+    display: flex;
+    justify-content: center;
+}
+
+
+.connexionForm > div
+{
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.connexionForm > div > label
+{
+    width: 10rem;
+}
+
+.connexionForm > div > input
+{
+    border-radius: 10px;
+    border: 3px solid rgb(168, 168, 162);
+    padding: 5px;
+}
