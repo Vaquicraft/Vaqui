@@ -1,7 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
 *
 {
     background-color: #1A1A1A;
     color: #F0F0F0;
+    font-family:"Roboto";
+}
+
+li > a, .formSubmit /* Applique le font family à tous les boutons*/
+{
+    font-family:"Roboto";
+}
+
+h1, h2, h3, h4, h5
+{
+    font-family:"Instrument Sans";
 }
 
 /* HEADER */
