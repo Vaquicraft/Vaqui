@@ -1,8 +1,10 @@
 *
 {
-    background-color: #111;
-    color: white;
+    background-color: #1A1A1A;
+    color: #F0F0F0;
 }
+
+/* HEADER */
 
 .headerMenu
 {
@@ -13,7 +15,7 @@
 
 .headerMenu > li
 {
-    background-color: rgb(90, 221, 50);
+    background-color: #00FF88;
     padding: 10px;
     border-radius: 10px;
     list-style: none;
@@ -24,12 +26,13 @@
 .headerMenu > li > a
 {
     background-color: inherit;
+    color: #1A1A1A;
     text-decoration: none;
-
- 
-
     font-weight: bold;
 }
+
+/* MAIN */
+
 
 .connexionMainTitle
 {
@@ -37,22 +40,60 @@
     justify-content: center;
 }
 
+/* CONNEXION FORM */
+
+
+.connexionForm
+{
+    background-color: #2A2A2A;
+    border:3px solid #222; 
+    border-radius: 50px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    width: 500px;
+    margin: 0 auto;
+
+}
+
+.connexionSubTitle
+{
+    background-color: inherit;
+    font-size: 25px;
+    color: #A0A0A0;
+}
 
 .connexionForm > div
 {
     margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
+    background-color: inherit;
 }
 
 .connexionForm > div > label
 {
+    background-color: inherit;
     width: 10rem;
+    display: flex;
+    justify-content: center;
 }
 
 .connexionForm > div > input
 {
+    
     border-radius: 10px;
-    border: 3px solid rgb(168, 168, 162);
+    border: 3px solid #444;
     padding: 5px;
+}
+
+.formSubmit
+{
+    background-color: #00FF88;
+    color: #1A1A1A;
+    font-weight: bold;
+    font-size: large;
+    padding: 10px;
+    border-radius: 10px;
+    border: 0px solid black;
 }

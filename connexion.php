@@ -18,7 +18,7 @@ if (session_status() == PHP_SESSION_NONE)
 	<header class="header">
 		<ul class="headerMenu">
 			<li class="headerMenuConnexion">
-				<a href="connexion.php">Se connecter</a>
+				<a href="connexion.php">Connexion</a>
 			</li>
 
 			<li class="headerMenuRegister">
@@ -41,6 +41,9 @@ if (session_status() == PHP_SESSION_NONE)
 	</div>
 
 	<div class="connexionForm">
+		<h2 class="connexionSubTitle">
+			Connexion
+		</h2>
 		<form method="post" action="traitement_connexion.php"></form>
 
 		<div class="connexionUsernameForm">
