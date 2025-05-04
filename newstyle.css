@@ -56,7 +56,7 @@ h1, h2, h3, h4, h5
 /* CONNEXION FORM */
 
 
-.connexionForm
+.formContent
 {
     background-color: #2A2A2A;
     border:3px solid #222; 
@@ -71,33 +71,34 @@ h1, h2, h3, h4, h5
 
 }
 
-.connexionSubTitle
+.formSubTitle
 {
     background-color: inherit;
     font-size: 25px;
     color: #A0A0A0;
 }
 
-.connexionForm > div
+.formContent > div
 {
     margin-bottom: 20px;
     background-color: inherit;
 }
 
-.connexionForm > div > label
+.formContent > div > label
 {
     background-color: inherit;
-    width: 10rem;
+    width: auto;
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 
-.connexionForm > div > input
+.formContent > div > input
 {
-    
     border-radius: 10px;
     border: 3px solid #444;
     padding: 5px;
+    width: 14rem;
 }
 
 .formSubmit

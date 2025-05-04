@@ -8,10 +8,10 @@
 		{
 			header('location: membre.php');
 		}	
-		else		
-			{
-				require 'formulaire.php';
-			}	
+	else		
+		{
+			require 'formulaire_inscription.php';
+		}	
 	?>
 
 

@@ -1,6 +1,8 @@
 <?php
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if (isset($_SESSION['login']))
 {
@@ -16,44 +18,49 @@ require 'functions.php';
 bdd_connexion();
 require 'inscription.php';
 
+$errors = [];
 
 $req=$pdo->prepare("SELECT * FROM users WHERE login=?");
 $req->execute(array($_POST['login']));
 $donnees=$req->fetch();
 if (!empty($donnees))
 {
-	echo "<h2> Ce nom d'utilisateur est déjà utilisé.</h2> </html>";
-	die;
+	$errors[] = "Ce nom d'utilisateur est déjà utilisé.";
+}
+
+if (strlen($_POST['login']) <= 3)
+{
+	$errors[] = "Le nom d'utilisateur est trop court (4 caractères minimum)";
+}
+
+if (strlen($_POST['password']) <= 6 || $_POST['password'] != $_POST['passwordverif'])
+{
+	$errors[] = "Le mot de passe est différent de la confirmation, ou est trop court. (7 caractères minimum).";
 }
 
 $req=$pdo->prepare("SELECT * FROM users WHERE mail=?");
 $req->execute(array($_POST['mail']));
 $donnees=$req->fetch();
+
 if (!empty($donnees))
 {
-	echo "<html> <h2> Cette adresse mail est déjà utilisée.</h2> </html>";
-	die;
-}
-
-if (strlen($_POST['login']) <= 3)
-{
-	echo "<html> <h2> Votre pseudo est trop court. (4 caractères minimum).</h2> </html>";
-	die;
-}
-
-if (strlen($_POST['password']) <= 6 || $_POST['password'] != $_POST['passwordverif'])
-{
-	echo "<html> <h2> Votre mot de passe invalide ou trop court. (7 caractères minimum). </h2> </html>";
-	die;
+	$errors[] = "Cette adresse mail est déjà utilisée.";
 }
 
 if (!preg_match("#^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#", $_POST['mail']))
 {
-	echo "<html> <h2> Votre adresse mail est invalide.</h2> </html>";
-	die;
+	$errors[] = "L'adresse mail est invalide.";
 }
 
-else
+if (!empty($erreurs)) 
+{
+    $_SESSION['registerErros'] = $erreurs;
+    header("Location: formulaire_inscription.php");
+    exit;
+}
+
+
+else //INSCRIPTION REUSSIE
 {
 	$pass_hache = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
@@ -99,8 +106,9 @@ else
 			'training_life' => 0
 		]);
 
-	echo "<html> <h2> Votre inscription s'est déroulée avec succès ! <h2> </html>";
-	echo '<html> <center><a href="index.php">Cliquez ici pour vous connecter</a></center> <br /> </html>';
+	$registerSuccess = [];
+	$registerSuccess[] = "Votre inscription s'est déroulée avec succès !" ;
+	$_SESSION['registerSuccess'] = $registerSuccess;
 }
 
 ?>

@@ -1,3 +1,22 @@
+<?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$registerErrors = $_SESSION['registerErros'] ?? [];
+unset($_SESSION['registerErros']);
+
+if(!empty($registerErrors))
+{
+	foreach ($registerErrors as $err)
+	{
+		echo $err;
+	}
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -24,15 +43,15 @@
 		</ul>
 	</header>
 
+	<div class="connexionMain">
+		<h1 class="connexionMainTitle">
+			The Wheel of Fight
+		</h1>
+	</div>
 
-	<h1 class="connexionMainTitle">
-		The Wheel of Fight
-	</h1>
-
-
-		<form class="formContent" method="post" action="traitement_connexion.php">
+		<form class="formContent" method="post" action="traitement_inscription.php">
 			<h2 class="formSubTitle">
-				Connexion
+				Inscription
 			</h2>
 
 			<div class="usernameForm">
@@ -42,7 +61,17 @@
 
 			<div class="passwordForm">
 				<label class="formLabel" for="password">Mot de Passe</label>
-				<input class="formField" id="password" name="pass" type="password" required>
+				<input class="formField" id="password" name="password" type="password" required>
+			</div>
+
+			<div class="passwordConfirmForm">
+				<label class="formLabel" for="password">Mot de Passe (confirmation)</label>
+				<input class="formField" id="passwordverif" name="passwordverif" type="password" required>
+			</div>
+
+			<div class="mailForm">
+				<label class="formLabel" for="mail">Adresse Mail</label>
+				<input class="formField" id="mail" name="mail" type="text" required>
 			</div>
 
 			<div class="submitForm">
