@@ -111,3 +111,48 @@ h1, h2, h3, h4, h5
     border-radius: 10px;
     border: 0px solid black;
 }
+
+.headerLinks
+{
+   display: flex;
+   justify-content: center;
+}
+
+.linksList
+{
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+}
+
+.link
+{
+    background-color: #00FF88;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    font-size: 1.25rem;
+}
+
+.link:hover
+{
+    border: 2px solid rgb(179, 32, 32);
+}
+
+.link > img
+{
+    width: 20px;
+}
+
+
+
+.link > a, img
+{
+    background-color: inherit;
+    color:#1A1A1A;
+    text-decoration: none;
+}

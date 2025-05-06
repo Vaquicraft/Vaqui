@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./newstyle.css">
+</head>
+<body>
+
+    <header class="headerLinks">
+        <ul class="linksList">
+            <li class="link">
+                <img src="images/home.png" alt="home_icon">
+                <a href="membre.php">Accueil</a>
+            </li>
+            
+            <li class="link">
+                <img src="images/perso.png" alt="home_icon">
+                <a href="perso.php">Info Perso</a>  
+            </li>
+    
+            <li class="link">
+                <img src="images/perso.png" alt="home_icon">
+                <a href="listpersos.php">Liste des Persos</a>  
+            </li>
+            
+            <li class="link">
+                <img src="images/fist.png" alt="home_icon">
+                <?php
+                echo '<a href="fight.php"> Combats (<span style="color:white">' . $fightCount . '</span>) </a>';
+    
+                ?>
+           
+            </li>
+            <li class="link">
+                <img src="images/mh.png" alt="home_icon">
+                <a href="story.php">Mode Histoire</a>  
+            </li>
+            
+            <li class="link">
+                <img src="images/training.png" alt="home_icon">
+                <a href="training.php">Entraînements</a>
+            </li>
+            <li class="link">
+                <img src="images/logout.png" alt="home_icon">
+                <a href="deconnexion.php">Déconnexion</a>
+            </li>
+    
+        </ul>
+
+    </header>
+    
+    
+    
+</body>
+</html>
