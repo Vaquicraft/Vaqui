@@ -156,3 +156,21 @@ h1, h2, h3, h4, h5
     color:#1A1A1A;
     text-decoration: none;
 }
+
+
+.news
+{
+    display: flex;
+    justify-content: center;
+    border: 3px solid #222;
+}
+
+.newsDate
+{
+    font-size: 1.1rem;
+}
+
+.newsContent
+{
+    width: 700px;
+}

@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="./newstyle.css">
-</head>
-<body>
+<?php
 
-    <header class="headerLinks">
+require('newfunctions.php');
+$displayFightList = false;
+getFights($displayFightList);
+
+?>
+
+    <header class="links">
         <ul class="linksList">
             <li class="link">
                 <img src="images/home.png" alt="home_icon">
@@ -50,8 +48,3 @@
         </ul>
 
     </header>
-    
-    
-    
-</body>
-</html>

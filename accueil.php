@@ -1,10 +1,10 @@
-<div class="links">
+<link rel="stylesheet" href="./newstyle.css">
 
 <?php
 
-require('links.html');
+require('links.php');
+require('news.html');
 
 ?>
 
-</div>
 
