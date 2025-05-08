@@ -2,7 +2,7 @@
 require 'functions.php';
 getUserData();
 
-menu();
+require 'links.php';
 ?>
 <div class="pageBuilder">
 <?php
@@ -34,7 +34,7 @@ echo  '<h2>Gestion des personnages de ' . $login . '</h2>';
           $modified = $_GET['perso'];
           $req = $pdo->prepare("UPDATE users SET selected_perso = ? WHERE login = ?");
           $req->execute([$modified, $login]);
-          header("Location: " . $_SERVER['PHP_SELF']);
+          // header("Location: " . $_SERVER['PHP_SELF']);
           $_SESSION['selected_perso'] = $modified;
       }
       }

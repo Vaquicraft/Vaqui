@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
-*
+body
 {
     background-color: #1A1A1A;
     color: #F0F0F0;
@@ -138,10 +138,6 @@ h1, h2, h3, h4, h5
     font-size: 1.25rem;
 }
 
-.link:hover
-{
-    border: 2px solid rgb(179, 32, 32);
-}
 
 .link > img
 {
@@ -173,4 +169,173 @@ h1, h2, h3, h4, h5
 .newsContent
 {
     width: 700px;
+}
+
+.registerErrorsDisplay
+{
+    background-color:#2A2A2A;
+    border-radius: 10px;
+}
+
+.registerErrorsDisplay > ul
+{
+    list-style: none;
+    
+    border-radius: 10px;
+    
+}
+
+.registerErrorsDisplay > ul > li
+{
+    
+    background-color: inherit;
+    padding: 15px;
+    border-radius: inherit;
+    color:#F88888;
+    width: 300px;
+}
+
+
+
+
+/* MODE HISTOIRE */
+
+
+
+/* .h2--title, .h3--title
+{
+    display: flex;
+    justify-content: center;
+}
+*/
+
+.storyButtonFight
+{
+    font-size: 2rem;
+    font-weight: bold;
+    color: #1A1A1A;
+    padding: 15px;
+    text-decoration: none;
+    background-color: #00FF88;
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    width: 200px;
+    margin-top: 50px;
+
+}
+
+/* .PageBuilderStorySpeak, .pageBuilderStoryFight
+{
+    height: 620px;
+    margin-left: 15%;
+    margin-right: 15%;
+    width: 70%;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+}
+
+.storyDialogue
+{
+    width: 800px;
+    justify-content:space-around;
+    flex-wrap: wrap;
+} */
+
+
+
+
+
+
+
+
+
+/* PERSOS */
+
+.persoBuilder
+{
+    width: 320px; /* ####### */
+    height: 200px;
+    display: flex; 
+    flex-direction: column;
+    border-radius: 20px;
+    background-color:#2A2A2A;
+    border: 2px solid #444;
+    padding: 5px;    
+    
+    padding: 5px;
+    margin: 0 15%;
+    margin-inline: 0;
+    margin-bottom: 20px;
+    margin-right: 50px;
+}
+
+
+
+
+.persoBuilderGlobalSlide li
+{
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 4%;
+
+}
+
+
+
+.persoBuilderName
+{
+    border: 2px solid black;
+    border-radius: 10px;
+    padding: 5px;
+    text-align: center;
+    background-color:#2A2A2A;
+    margin: 0 10%;
+}
+
+.persoBuilderStats
+{
+    display: flex;
+    padding: 3px;
+    margin-top: 5px;
+    width: 140%;
+    border-radius: 10px;
+
+}
+
+.persoBuilderMain
+{
+
+    display: flex;
+    justify-content:space-around;
+}
+
+
+
+.persoBuilderMain > .persoBuilderMainStat
+{
+
+    width: 120px;
+    border-radius: 10px;
+}
+
+.persoAvatar
+{
+    width: 100px;
+    height: 150px;
+    border: 1px solid black;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 5px;
+    
+}
+
+.persoBuilderStatsValue
+{
+    margin-left: 5px;
+    border-radius: 10px;
 }

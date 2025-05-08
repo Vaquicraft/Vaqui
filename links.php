@@ -1,6 +1,5 @@
 <?php
 
-require('newfunctions.php');
 $displayFightList = false;
 getFights($displayFightList);
 
@@ -42,7 +41,7 @@ getFights($displayFightList);
             </li>
             <li class="link">
                 <img src="images/logout.png" alt="home_icon">
-                <a href="deconnexion.php">Déconnexion</a>
+                <a href="logout.php">Déconnexion</a>
             </li>
     
         </ul>

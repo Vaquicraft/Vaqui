@@ -1,29 +1,40 @@
 <?php
 require 'functions.php';
 getUserData();
-menu();
-echo '<br /><h2>Mode Histoire</h2>';
-echo '<h2>Étape ' .$globalDataStory['mh_step'] .' - ' . $globalDataStory['mh_title'] . '</h2>';
-?>
-<div class="PageBuilderStorySpeak">
-<?php
-
-
-
-  checkMhStep();
+require 'links.php';
 
 ?>
-<div class="storyDialogue">
-    <?php
-    echo $globalDataStory['mh_dialogue'] . '<br /><br />';
-    ?>
 
+<div class="storyMainPage">
+    <h2 class="h2--title">
+      Mode Histoire
+    </h2>
+
+    <div class="storyMainPageContent">
+      <h3 class="h3--title">
+        <?php
+        echo 'Étape ' .$globalDataStory['mh_step'] .' - ' . $globalDataStory['mh_title'];
+        ?>
+      </h3>
+
+      <div class="PageBuilderStorySpeak">
+        <?php
+          checkMhStep();
+        ?>
+      </div>
+
+      <div class="storyDialogue">
+        <?php
+          echo $globalDataStory['mh_dialogue'];
+        ?>
+      </div>
+      <a class="storyButtonFight" href="storyfight.php">Combattre !</a>
+
+    </div>
 </div>
 
-<?php
-echo '<a href="storyfight.php">Combattre !</a>';
 
-?>
 
-</div>
+
+
 

@@ -1,68 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Naruto Project</title>
-    <link rel="stylesheet" href="./style.css" /> 
-</head>
-<body>
-   
-</body>
-</html>
+<link rel="stylesheet" href="./newstyle.css">
 
 <?php
-function check_login()
+
+// Vérifie si l'utilisateur possède une session PHP,si ce n'est pas le cas on initialise la session avec session_start(). 
+// On retourne éventuellement la redirection nécessaire en fonction du cas
+// Cette fonction doit être appelée à chaque fois que l'on doit manipuler les variables $_SESSION.
+
+function initSession(): void
 {
-    global $login;
+    global $redirect;
+    
     if (session_status() == PHP_SESSION_NONE)
-        {
+    {
         session_start();
-        $login = $_SESSION['login'];
-            if (!isset($_SESSION['login']))
-            {
-            header('location: index.php');
-            }
-    }   
-}
+    }
 
-function bdd_connexion()
-{
-    global $pdo;
-    try
-  {
-    $pdo = new PDO('mysql:host=localhost;dbname=db;charset=utf8', 'root', '');
-  }
-catch(Exception $e)
-  {
-    die('Erreur : '.$e->getMessage());   
-  }
-}
+    if (basename($_SERVER['PHP_SELF']) == "inscription.php")
+        {
+            $redirect = "inscription.php";
+            return;
+        }
 
-function check_session()
-{
-    global $selected_perso, $pdo, $req, $data, $login;
-    check_login();
-    bdd_connexion();
-    if (isset($_SESSION['selected_perso']))
-            {
-                $selected_perso = $_SESSION['selected_perso'];
-            }
+    if (empty($_SESSION['login']))
+    {
+        
+        $redirect = "connexion.php";
+    }
     else
     {
-        $req = $pdo->prepare("SELECT * FROM users WHERE login = ?");
-        $req->execute([$login]);
-        $data = $req->fetch();
-        $selected_perso = $data['selected_perso'];
-        $_SESSION['selected_perso'] = $selected_perso;
+        // $redirect = "membre.php";
+        return;
+    }
+    if (basename($_SERVER['PHP_SELF']) != $redirect)
+    {
+        header("location:$redirect");
     }
 }
 
+//Connexion à la BDD principale
+function bddConnexion(): void
+{
+    global $pdo; //On doit récupérer le PDO quand on appelle la fonction
+    try
+    {
+        $pdo = new PDO('mysql:host=localhost;dbname=db;charset=utf8', 'root', '');
+    }
+
+    catch (PDOException $e)
+    {
+        error_log('Erreur de connexion à la BDD Principale' . $e->getMessage());
+        exit('Une erreur technique est survenue.');
+    }
+}
+
+//Appelle la fonction qui initialise les sessions utilisateur
+//Appelle la fonction qui initialise la base de données principale
+function initGlobal(): void
+{
+    initSession();
+    bddConnexion();
+}
+
+
+
 function getUserData()
 {
-    global $login, $pdo, $globalDataUser, $globalDataStory, $globalDataPerso;
-    check_session();
+    global $login, $selectedPerso, $pdo, $globalDataUser, $globalDataPerso, $globalDataStory;
+    initGlobal();
 
+    $login = $_SESSION['login'];
+    $selectedPerso = $_SESSION['selectedPerso'];
+    
+    // Liaison tables users et persos -> login
     $req=$pdo->prepare("
     SELECT persos.*, users.*
     FROM persos 
@@ -72,6 +81,7 @@ function getUserData()
     $req->execute([$login]);
     $globalDataUser=$req->fetch();
 
+    // Liaison tables users et persos -> name_perso
     $req = $pdo->prepare("
     SELECT persos.*, users.*
     FROM users 
@@ -81,6 +91,8 @@ function getUserData()
     $req->execute([$globalDataUser['selected_perso'], $login]);
     $globalDataPerso = $req->fetch();
 
+    
+    // Liaison tables users et mh_steps -> mh_step
     $req=$pdo->prepare("
     SELECT users.*, mh_steps.*
     FROM users 
@@ -91,43 +103,12 @@ function getUserData()
     $globalDataStory=$req->fetch();
 }
 
-
-function menu()
+function newPerso($namePerso)
 {
-    global $pdo;
-    getUserData();
-    ?>
-    <nav class="links">
-    <?php
-    links();
-    ?>
-    </nav>
-    <?php
-}
+    global $pdo, $login, $globalDataUser, $globalDataStory, $name;
+    initGlobal();
 
-function footer()
-{
-    global $pdo, $dataPerso, $persoBuilderDisplayValue, $login, $globalDataUser, $persoBuilderTarget;
-    getUserData();
-    ?>
-    <footer>
-        <?php
-        $req=$pdo->prepare("SELECT * FROM persos WHERE owner_perso = ? AND name_perso = ?");
-        $req->execute([$login, $globalDataUser['selected_perso']]);
-        $dataPerso=$req->fetch();
-        $persoBuilderDisplayValue = "noLink";
-        $persoBuilderTarget = "player";   
-        persoBuilderGlobal($dataPerso, $persoBuilderDisplayValue, $persoBuilderTarget);
-        
-        ?>
-    </footer>
-    <?php
-}
-
-function new_perso()
-{
-    global $pdo, $login, $globalDataUser, $globalDataStory;
-    getUserData();
+    $login = $_SESSION['login'];
   
     $req = $pdo->prepare
     ('
@@ -138,7 +119,7 @@ function new_perso()
     $req->execute
     ([
         'owner_perso' => $login,
-        'name_perso' => $globalDataStory['mh_reward_1'],
+        'name_perso' => $namePerso,
         'power_perso' => 10,
         'xp_perso' => 0,
         'nin_perso' => 1,
@@ -361,7 +342,7 @@ function checkMhStep()
 function fightProcess($fightResult)
 {
     global $pdo, $fightResult, $dataFighter, $dataAdversary, $dataXP;
-    bdd_connexion();
+    bddConnexion();
 
         
     $fighterWin = 0;
@@ -668,56 +649,130 @@ function getFights($displayFightList)
     return $fightCount;
 }
 
-function links()
+
+
+
+
+
+
+
+//Vérifie les informations de connexion depuis la page connexion.php et vers la BDD reliée à l'utilisateur concerné.
+//Attribue les variables de session lors de la connexion
+function connexionProcess(): void
 {
-    global $fightCount, $displayFightList;
-    $displayFightList = false;
-    getFights($displayFightList);
-?>
-            <ul>
-                <li>
-                    <img src="images/home.png" alt="home_icon">
-                    <a href="membre.php">Accueil</a>
-                </li>
-                
-                <li>
-                    <img src="images/perso.png" alt="home_icon">
-                    <a href="perso.php">Info Perso</a>  
-                </li>
+    global $pdo;
+    
+    initGlobal();
 
-                <li>
-                    <img src="images/perso.png" alt="home_icon">
-                    <a href="listpersos.php">Liste des Persos</a>  
-                </li>
-                
-                <li>
-                    <img src="images/fist.png" alt="home_icon">
-                    <?php
-                    echo '<a href="fight.php"> Combats (<span style="color:white">' . $fightCount . '</span>) </a>';
+    $login = $_POST['login'];
+    $password = $_POST['pass'];
 
-                    ?>
-               
-                </li>
-                <li>
-                    <img src="images/mh.png" alt="home_icon">
-                    <a href="story.php">Mode Histoire</a>  
-                </li>
-                
-                <li>
-                    <img src="images/training.png" alt="home_icon">
-                    <a href="training.php">Entraînements</a>
-                </li>
-                <li>
-                    <img src="images/logout.png" alt="home_icon">
-                    <a href="deconnexion.php">Déconnexion</a>
-                </li>
-        
-            </ul>
-
-
-        <?php
+	$hache = sha1($password);			   
+	$req=$pdo->prepare('SELECT * FROM users WHERE login=?');
+	$req->execute([$login]);
+	$data=$req->fetch();
+		
+	if (!$data || !password_verify($password, $data['password']))
+	{
+        $_SESSION['connexionMessage'] = "Identifiants incorrects.";
+	}
+		
+	else //Connexion réussie
+	{
+		$_SESSION['login'] = $data['login'];
+		$_SESSION['selectedPerso'] = $data['selected_perso'];
+        header('location:membre.php');
+	}
 }
 
 
+function registerProcess(): void
+{
+    global $pdo, $errors, $name, $registerSuccess;
+    initSession();
+    bddConnexion();
+
+
+    $req=$pdo->prepare("SELECT * FROM users WHERE login=?");
+    $req->execute(array($_POST['login']));
+    $data=$req->fetch();
+
+
+
+    $_SESSION['registerError'] = [];
+
+    if (!empty($data))
+    {
+        $errors[] = "Ce nom d'utilisateur est déjà utilisé.";
+    }
+
+    if (strlen($_POST['login']) <= 3)
+    {
+        $errors[] = "Le nom d'utilisateur est trop court (4 caractères minimum)";
+    }
+
+    if (strlen($_POST['password']) <= 6)
+    {
+        $errors[] = "Le mot de passe est trop court. (7 caractères minimum)";
+    }
+
+    if ($_POST['password'] != $_POST['passwordverif'])
+    {
+        $errors[] = "Le mot de passe est différent de la confirmation.";
+    }
+
+    $req=$pdo->prepare("SELECT * FROM users WHERE mail=?");
+    $req->execute(array($_POST['mail']));
+    $data=$req->fetch();
+
+    if (!empty($data))
+    {
+        $errors[] = "Cette adresse mail est déjà utilisée.";
+    }
+
+    if (!preg_match("#^[a-z0-9._-]+@[a-z0-9._-]{2,}\.[a-z]{2,4}$#", $_POST['mail']))
+    {
+        $errors[] = "L'adresse mail est invalide.";
+    }
+
+    if(!empty($errors))
+    {
+        return;
+    }
+
+    //Inscription réussie
+    else 
+    {
+    
+        $pass_hache = password_hash($_POST['password'], PASSWORD_DEFAULT);
+
+        $login = $_POST['login'];
+        $password = $_POST['password'];
+        $passwordverif = $_POST['passwordverif'];
+        $mail = $_POST['mail'];
+        $firstPerso = "Naruto";
+
+        $_SESSION['login'] = $login;
+        $_SESSION['selectedPerso'] = $firstPerso;
+                
+        // Insertion des données de l'utilisateur dans la table users de la base de données principale
+        $req = $pdo->prepare('INSERT INTO users(login, password, mail, date_inscription, user_mh_step, selected_perso) VALUES(:login, :password, :mail, NOW(), :user_mh_step, :selected_perso)');
+        $req->execute(array(
+            'login' => $login,
+            'password' => $pass_hache,
+            'mail' => $mail,
+            'user_mh_step' => 1,
+            'selected_perso' => $firstPerso
+        ));
+
+    
+        newPerso($firstPerso);
+
+        $registerSuccess = "Votre inscription s'est déroulée avec succès !" ;
+        session_destroy();
+
+        
+    }
+}
 
 ?>

@@ -1,7 +1,7 @@
 <?php
 require 'functions.php';
 getUserData();
-menu();
+require 'links.php';
 
     $trainingPerso = $_SESSION['selected_perso'];
     echo '<a href="training.php?training=1">Entraînement de Ninjutsu (+1) (1h00)</a><br />';

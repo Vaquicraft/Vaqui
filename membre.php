@@ -1,22 +1,9 @@
     <?php
-
-    require 'functions.php';
-
-    getUserData();
-    menu();
-    ?>
-    <div class="pageBuilder">
-            <div class ="news">
-                <?php
-                // require 'news.html';
-                ?>
-            </div>
-    </div>
-    <?php
-
-    footer();
-
     
-
+    require('functions.php');
+    require('links.php');
+    require('news.html');
+    require('footer.php');
+    
     ?>
 
