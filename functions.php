@@ -24,7 +24,7 @@ function initSession(): void
     if (empty($_SESSION['login']))
     {
         
-        $redirect = "connexion.php";
+        $redirect = "index.php";
     }
     else
     {

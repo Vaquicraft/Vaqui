@@ -47,7 +47,18 @@ h1, h2, h3, h4, h5
 /* MAIN */
 
 
-.connexionMainTitle
+.homeMessage
+{
+    background-color: #222;
+    width: 400px;
+    margin: 0 auto; /*Permet de centrer le bloc malgré le display, qui saute à cause du width */
+    padding: 30px;
+    border-radius: 15px;
+    border: 3px solid #444;
+    
+}
+
+ .connexionMainTitle, .connexionMain > p
 {
     display: flex;
     justify-content: center;
