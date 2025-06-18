@@ -1,4 +1,3 @@
-2016/10/21
+2025/06/06
 
-Les systèmes d'inscription, de connexion et de déconnexion sont opérationnels.
-Les pages sont aérées et commentées pour plus de visibilité et de compréhension.
+Initialisation de la migration du jeu d'une base PHP vers une base JS, avec un nouveau design
